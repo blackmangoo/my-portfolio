@@ -1,9 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import { siteConfig } from "@/data/site";
 import { MotionWrapper } from "./MotionWrapper";
 import { SectionHeader } from "./SectionHeader";
-import { Award, Image as ImageIcon } from "lucide-react";
+import { Award } from "lucide-react";
 
 export function CertificationSection() {
   return (
@@ -43,14 +44,15 @@ export function CertificationSection() {
                     </div>
                   </div>
 
-                  {/* Image / Placeholder Container */}
+                  {/* Image Container */}
                   <div className="w-full md:w-[320px] shrink-0">
-                    <div className="aspect-[4/3] rounded-xl border-2 border-dashed border-slate-700 bg-slate-800/50 flex flex-col items-center justify-center p-6 text-center overflow-hidden relative transition-colors group-hover:border-cyan-500/50 group-hover:bg-slate-800/80">
-                      <ImageIcon className="w-10 h-10 text-slate-500 mb-3 group-hover:text-cyan-400 transition-colors" />
-                      <p className="text-sm text-slate-400 font-medium">Certificate Image Pending</p>
-                      <p className="text-xs text-slate-500 mt-2 font-mono">
-                        Add to: public{cert.imagePath.replace('/certificates', '/certificates')}
-                      </p>
+                    <div className="aspect-[4/3] rounded-xl border border-slate-700 bg-slate-800/50 overflow-hidden relative group-hover:border-cyan-500/50 transition-colors">
+                      <Image
+                        src={cert.imagePath}
+                        alt={`${cert.organization} Certificate`}
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
                     </div>
                   </div>
 
