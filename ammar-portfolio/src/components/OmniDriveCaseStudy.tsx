@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Github, Play, FileText, ChevronRight } from "lucide-react";
+import { Github, FileText, ChevronRight } from "lucide-react";
 import { omniDrive } from "@/data/projects";
 import { MotionWrapper } from "./MotionWrapper";
 import { SectionHeader } from "./SectionHeader";

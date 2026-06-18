@@ -42,11 +42,20 @@ export const siteConfig = {
     { label: 'Certificate', href: '#certificate' },
     { label: 'Contact', href: '#contact' },
   ] as NavItem[],
-  certification: {
-    title: 'AI/ML Engineering Internship Certificate',
-    organization: 'DevelopersHub Corporation',
-    details: '6-week AI/ML Engineering internship with exceptional performance recognition.',
-    dates: '28 April 2026 – 9 June 2026',
-    imagePath: '/certificates/developershub-certificate.png',
-  },
+  certifications: [
+    {
+      title: 'AI/ML Engineering Internship Certificate',
+      organization: 'DevelopersHub Corporation',
+      details: '6-week AI/ML Engineering internship with exceptional performance recognition.',
+      dates: '28 April 2026 – 9 June 2026',
+      imagePath: '/certificates/developershub-certificate.png',
+    },
+    {
+      title: 'AI Developer Internship Certificate',
+      organization: 'Nexium',
+      details: 'Full-stack AI application development using React, Next.js, and Gemini API.',
+      dates: 'June 2025 – August 2025',
+      imagePath: '/certificates/nexium-certificate.png',
+    }
+  ],
 } as const;

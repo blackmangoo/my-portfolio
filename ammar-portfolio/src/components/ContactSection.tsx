@@ -17,11 +17,11 @@ export function ContactSection() {
         
         {/* ── Contact CTA Area ── */}
         <MotionWrapper className="text-center mb-24 max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-5xl font-bold text-white mb-6">
-            Let's Build Something <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Great</span>
+          <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight mb-6">
+            Let&apos;s Build Something <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Great</span>
           </h2>
-          <p className="text-lg text-slate-400 mb-10 leading-relaxed">
-            I am currently open to Summer 2026 AI/ML Engineering and Full-Stack Software Development roles. If you're looking for a dedicated engineer who builds robust, scalable AI systems, let's connect.
+          <p className="text-lg text-slate-300 mb-10 leading-relaxed">
+            I am currently open to Summer 2026 AI/ML Engineering and Full-Stack Software Development roles. If you&apos;re looking for a dedicated engineer who builds robust, scalable AI systems, let&apos;s connect.
           </p>
 
           <div className="flex flex-wrap justify-center gap-4">

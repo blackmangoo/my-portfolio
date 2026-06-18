@@ -1,7 +1,7 @@
 "use client";
 
 import { skillGroups } from "@/data/skills";
-import { MotionWrapper, staggerContainer, staggerItem } from "./MotionWrapper";
+import { staggerContainer, staggerItem } from "./MotionWrapper";
 import { SectionHeader } from "./SectionHeader";
 import { motion } from "framer-motion";
 import {

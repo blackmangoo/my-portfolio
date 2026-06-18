@@ -20,7 +20,6 @@ interface SectionHeaderProps {
 export function SectionHeader({
   title,
   subtitle,
-  accentColor,
   accentFrom = "from-blue-500/50",
   icon,
 }: SectionHeaderProps) {
@@ -33,7 +32,7 @@ export function SectionHeader({
       className="mb-16"
     >
       <div className="flex items-center gap-6 mb-4">
-        <h2 className="text-4xl font-bold flex items-center gap-4 text-white">
+        <h2 className="text-4xl font-bold tracking-tight flex items-center gap-4 text-white">
           {icon}
           {title}
         </h2>

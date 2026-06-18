@@ -53,7 +53,7 @@ const panelReveal = {
    ═══════════════════════════════════════════════════════════ */
 const detectionResults = [
   { label: "Brake Pad", confidence: 97.2, color: "from-emerald-500 to-emerald-400" },
-  { label: "Tire Wear", confidence: 94.1, color: "from-blue-500 to-cyan-400" },
+  { label: "Tire", confidence: 94.1, color: "from-blue-500 to-cyan-400" },
   { label: "Headlight", confidence: 91.8, color: "from-purple-500 to-purple-400" },
   { label: "Windshield", confidence: 88.4, color: "from-amber-500 to-yellow-400" },
 ];
@@ -182,10 +182,10 @@ function AIDashboardMockup() {
             >
               <div className="flex items-center justify-between mb-3">
                 <span className="text-[11px] font-semibold text-slate-300 tracking-wide">
-                  YOLO Detections
+                  Detection Confidence
                 </span>
                 <span className="text-[9px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-medium">
-                  v11
+                  YOLOv11
                 </span>
               </div>
               <div className="space-y-2.5">

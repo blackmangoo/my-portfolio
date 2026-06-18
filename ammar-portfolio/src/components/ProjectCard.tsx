@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ExternalLink, Github } from "lucide-react";
+import { Github } from "lucide-react";
 import { staggerItem } from "./MotionWrapper";
 
 interface ProjectCardProps {
