@@ -21,7 +21,7 @@ export function ContactSection() {
             Let&apos;s Build Something <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Great</span>
           </h2>
           <p className="text-lg text-slate-300 mb-10 leading-relaxed">
-            I am currently open to Summer 2026 AI/ML Engineering and Full-Stack Software Development roles. If you&apos;re looking for a dedicated engineer who builds robust, scalable AI systems, let&apos;s connect.
+            I am currently open to full-time AI/ML Engineering and Full-Stack Software Development roles. If you&apos;re looking for a dedicated engineer who builds robust, scalable AI systems, let&apos;s connect.
           </p>
 
           <div className="flex flex-wrap justify-center gap-4">

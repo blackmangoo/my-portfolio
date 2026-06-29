@@ -62,10 +62,10 @@ export const omniDrive: FlagshipProject = {
     "n8n",
   ],
   metrics: [
-    { value: "94.7%", label: "Diagnostic Accuracy" },
+    { value: "99.1%", label: "Top-1 Accuracy" },
     { value: "5", label: "AI Modules" },
-    { value: "<200ms", label: "Inference Latency" },
-    { value: "12K+", label: "Training Samples" },
+    { value: "~110ms", label: "CPU Inference" },
+    { value: "12,000", label: "Training Samples" },
   ],
   modules: [
     {

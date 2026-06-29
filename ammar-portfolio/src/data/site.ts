@@ -31,7 +31,7 @@ export const siteConfig = {
     headline: 'AI/ML Engineer building deployable Computer Vision, RAG & Full-Stack AI systems.',
     subheadline: 'Final-semester BS Artificial Intelligence student at FAST-NUCES, building production-style AI products with Python, FastAPI, Supabase, YOLOv11, LLMs, RAG pipelines, Streamlit, and modern full-stack interfaces.',
     badges: ['Python', 'FastAPI', 'YOLOv11', 'RAG', 'Supabase', 'Flutter', 'Hugging Face', 'Streamlit'],
-    cta: 'Open to Summer 2026 AI/ML Engineering and Full-Stack Software Development roles.',
+    cta: 'Open to full-time AI/ML Engineering and Full-Stack Software Development roles.',
   },
   navItems: [
     { label: 'Home', href: '#home' },
