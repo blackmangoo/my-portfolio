@@ -5,15 +5,6 @@ import type { ReactNode } from "react";
 
 // ─── Shared Animation Variants ──────────────────────────────────────────────
 
-export const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, ease: [0.25, 1, 0.5, 1] as const },
-  },
-};
-
 export const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   visible: {
@@ -27,7 +18,7 @@ export const staggerItem: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.4, ease: [0.25, 1, 0.5, 1] as const },
+    transition: { duration: 0.4, ease: [0.25, 1, 0.5, 1] },
   },
 };
 
@@ -36,11 +27,8 @@ export const staggerItem: Variants = {
 interface MotionWrapperProps {
   children: ReactNode;
   className?: string;
-  /** Use stagger container variant instead of single fadeUp */
   stagger?: boolean;
-  /** Viewport margin for triggering animation */
   margin?: string;
-  /** Custom delay in seconds */
   delay?: number;
 }
 
@@ -51,18 +39,26 @@ export function MotionWrapper({
   className = "",
   stagger = false,
   margin = "-100px",
-  delay,
+  delay = 0,
 }: MotionWrapperProps) {
-  const variants = stagger ? staggerContainer : fadeUp;
+  const customFadeUp = {
+    hidden: { opacity: 0, y: 40 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.5, ease: [0.25, 1, 0.5, 1] as const, delay },
+    },
+  };
+
+  const variants = stagger ? staggerContainer : customFadeUp;
 
   return (
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin }}
+      viewport={{ once: true, margin: margin as any }}
       variants={variants}
       className={className}
-      transition={delay ? { delay } : undefined}
     >
       {children}
     </motion.div>

@@ -2,37 +2,46 @@
 
 import { useRef, useMemo } from "react";
 import { siteConfig } from "@/data/site";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Suspense } from "react";
+import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
 
-function PointCloud() {
+import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
+
+function FacePointCloud() {
   const ref = useRef<THREE.Points>(null);
-  const particleCount = 2000;
+  
+  // Load the face model
+  const obj = useLoader(OBJLoader, '/face.obj');
   
   const positions = useMemo(() => {
-    const positions = new Float32Array(particleCount * 3);
-    for (let i = 0; i < particleCount; i++) {
-      const theta = Math.random() * 2 * Math.PI;
-      const phi = Math.acos((Math.random() * 2) - 1);
-      const r = 2.5 + Math.random() * 0.5;
-      
-      positions[i * 3] = r * Math.sin(phi) * Math.cos(theta);
-      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      positions[i * 3 + 2] = r * Math.cos(phi);
-    }
-    return positions;
-  }, []);
+    let pos: Float32Array | null = null;
+    obj.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        // Just take the first mesh's positions
+        if (!pos) pos = child.geometry.attributes.position.array;
+      }
+    });
+    return pos || new Float32Array(0);
+  }, [obj]);
 
   useFrame((state, delta) => {
     if (ref.current) {
-      // Just a slow idle rotation, OrbitControls handles the rest
-      ref.current.rotation.x += delta * 0.02;
+      // Parallax effect: subtly track the mouse
+      const targetX = (state.pointer.x * Math.PI) / 4;
+      const targetY = (state.pointer.y * Math.PI) / 4;
+      
+      // Smooth interpolation using lerp
+      ref.current.rotation.y += (targetX - ref.current.rotation.y) * 0.05;
+      ref.current.rotation.x += (-targetY - ref.current.rotation.x) * 0.05;
     }
   });
 
+  if (positions.length === 0) return null;
+
   return (
-    <points ref={ref}>
+    <points ref={ref} scale={0.06} position={[0, -1.5, 0]}>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
@@ -40,11 +49,11 @@ function PointCloud() {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.015}
+        size={0.02}
         color="#2C5545"
         sizeAttenuation={true}
         transparent={true}
-        opacity={0.6}
+        opacity={0.7}
       />
     </points>
   );
@@ -97,8 +106,9 @@ export function Hero() {
         {/* RIGHT: Restrained 3D Visual */}
         <div className="relative h-[400px] lg:h-[600px] w-full flex items-center justify-center -mr-12 opacity-80 pointer-events-none lg:pointer-events-auto">
           <Canvas camera={{ position: [0, 0, 5], fov: 60 }}>
-            <PointCloud />
-            <OrbitControls enableZoom={false} enablePan={false} autoRotate autoRotateSpeed={1.0} />
+            <Suspense fallback={null}>
+              <FacePointCloud />
+            </Suspense>
           </Canvas>
           {/* Subtle overlay to soften it */}
           <div className="absolute inset-0 bg-gradient-to-r from-[#FAF9F6] via-transparent to-transparent pointer-events-none" />
