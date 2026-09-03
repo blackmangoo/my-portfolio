@@ -28,20 +28,23 @@ function FacePointCloud() {
 
   useFrame((state, delta) => {
     if (ref.current) {
-      // Parallax effect: subtly track the mouse
-      const targetX = (state.pointer.x * Math.PI) / 4;
-      const targetY = (state.pointer.y * Math.PI) / 4;
+      // Prominent parallax effect: aggressive tracking
+      const targetX = (state.pointer.x * Math.PI) / 1.5;
+      const targetY = (state.pointer.y * Math.PI) / 1.5;
       
       // Smooth interpolation using lerp
-      ref.current.rotation.y += (targetX - ref.current.rotation.y) * 0.05;
-      ref.current.rotation.x += (-targetY - ref.current.rotation.x) * 0.05;
+      ref.current.rotation.y += (targetX - ref.current.rotation.y) * 0.1;
+      ref.current.rotation.x += (-targetY - ref.current.rotation.x) * 0.1;
+
+      // Add a subtle continuous floating animation
+      ref.current.position.y = -1.5 + Math.sin(state.clock.elapsedTime) * 0.1;
     }
   });
 
   if (positions.length === 0) return null;
 
   return (
-    <points ref={ref} scale={0.06} position={[0, -1.5, 0]}>
+    <points ref={ref} scale={0.1} position={[0, -1.5, 0]}>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
@@ -49,11 +52,11 @@ function FacePointCloud() {
         />
       </bufferGeometry>
       <pointsMaterial
-        size={0.02}
+        size={0.035}
         color="#2C5545"
         sizeAttenuation={true}
         transparent={true}
-        opacity={0.7}
+        opacity={0.9}
       />
     </points>
   );

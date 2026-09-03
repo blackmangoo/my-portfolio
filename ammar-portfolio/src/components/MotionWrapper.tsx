@@ -9,16 +9,18 @@ export const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.1 },
+    transition: { staggerChildren: 0.15, delayChildren: 0.1 },
   },
 };
 
 export const staggerItem: Variants = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 50, scale: 0.9, filter: "blur(10px)" },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.4, ease: [0.25, 1, 0.5, 1] },
+    scale: 1,
+    filter: "blur(0px)",
+    transition: { type: "spring" as const, damping: 20, stiffness: 100 },
   },
 };
 
@@ -42,11 +44,13 @@ export function MotionWrapper({
   delay = 0,
 }: MotionWrapperProps) {
   const customFadeUp = {
-    hidden: { opacity: 0, y: 40 },
+    hidden: { opacity: 0, y: 50, scale: 0.95, filter: "blur(10px)" },
     visible: {
       opacity: 1,
       y: 0,
-      transition: { duration: 0.5, ease: [0.25, 1, 0.5, 1] as const, delay },
+      scale: 1,
+      filter: "blur(0px)",
+      transition: { type: "spring" as const, damping: 20, stiffness: 100, delay },
     },
   };
 
