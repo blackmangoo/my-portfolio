@@ -37,14 +37,14 @@ function FacePointCloud() {
       ref.current.rotation.x += (-targetY - ref.current.rotation.x) * 0.1;
 
       // Add a subtle continuous floating animation
-      ref.current.position.y = -1.5 + Math.sin(state.clock.elapsedTime) * 0.1;
+      ref.current.position.y = -1.2 + Math.sin(state.clock.elapsedTime) * 0.1;
     }
   });
 
   if (positions.length === 0) return null;
 
   return (
-    <points ref={ref} scale={0.1} position={[0, -1.5, 0]}>
+    <points ref={ref} scale={0.065} position={[0, -1.2, 0]}>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
