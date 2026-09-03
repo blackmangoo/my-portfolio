@@ -39,6 +39,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { CustomCursor } from "@/components/CustomCursor";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -46,7 +48,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="scroll-smooth">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-950 text-slate-50`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#FAF9F6] text-[#1A1A1A]`}>
+        <CustomCursor />
         {children}
       </body>
     </html>

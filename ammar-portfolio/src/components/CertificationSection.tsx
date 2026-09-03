@@ -1,67 +1,78 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import { siteConfig } from "@/data/site";
 import { MotionWrapper } from "./MotionWrapper";
-import { SectionHeader } from "./SectionHeader";
-import { Award } from "lucide-react";
+import { X, ExternalLink } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 
 export function CertificationSection() {
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
   return (
-    <section id="certificate" className="py-24 relative z-10">
-      <div className="max-w-7xl mx-auto px-6">
-        <SectionHeader
-          title="Certifications"
-          subtitle="Professional recognition and completed programs."
-          accentFrom="from-cyan-500/50"
-        />
+    <section id="certifications" className="py-24 relative z-10 bg-white border-t border-[#E5E7EB]">
+      <div className="max-w-4xl mx-auto px-6">
+        <MotionWrapper>
+          <div className="mb-12">
+            <h2 className="text-sm font-semibold text-[#1A1A1A] uppercase tracking-wider mb-4">Certifications</h2>
+          </div>
+        </MotionWrapper>
 
-        <div className="flex flex-col gap-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
           {siteConfig.certifications.map((cert, index) => (
-            <MotionWrapper key={index}>
-              <div className="relative group rounded-3xl glass-panel p-1 max-w-4xl mx-auto overflow-hidden">
-                {/* Animated border gradient */}
-                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+            <MotionWrapper key={index} delay={index * 0.1}>
+              <div className="flex flex-col group">
+                <div className="text-xs text-[#6B7280] font-medium mb-1">{cert.dates}</div>
+                <h3 className="text-base font-semibold text-[#1A1A1A] mb-1">{cert.title}</h3>
+                <div className="text-sm font-medium text-[#2C5545] mb-3">{cert.organization}</div>
+                <p className="text-sm text-[#6B7280] mb-4">{cert.details}</p>
                 
-                <div className="relative bg-slate-900/90 rounded-[22px] p-6 md:p-10 flex flex-col md:flex-row gap-8 items-center border border-slate-700/50">
-                  
-                  {/* Text Content */}
-                  <div className="flex-1 space-y-4 text-center md:text-left">
-                    <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-cyan-500/10 text-cyan-400 mb-2">
-                      <Award className="w-6 h-6" />
-                    </div>
-                    <h3 className="text-2xl md:text-3xl font-bold tracking-tight bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
-                      {cert.organization}
-                    </h3>
-                    <h4 className="text-xl font-semibold text-white">
-                      {cert.title}
-                    </h4>
-                    <p className="text-slate-300 leading-relaxed">
-                      {cert.details}
-                    </p>
-                    <div className="pt-4 inline-block px-4 py-1.5 rounded-full bg-slate-800 text-sm font-medium text-slate-300 border border-slate-700">
-                      {cert.dates}
-                    </div>
-                  </div>
-
-                  {/* Image Container */}
-                  <div className="w-full md:w-[320px] shrink-0">
-                    <div className="aspect-[4/3] rounded-xl border border-slate-700 bg-slate-800/50 overflow-hidden relative group-hover:border-cyan-500/50 transition-colors">
-                      <Image
-                        src={cert.imagePath}
-                        alt={`${cert.organization} Certificate`}
-                        fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    </div>
-                  </div>
-
-                </div>
+                <button
+                  onClick={() => setSelectedImage(cert.imagePath)}
+                  className="inline-flex items-center gap-2 text-xs font-medium text-[#1A1A1A] border border-[#E5E7EB] hover:border-[#2C5545] px-3 py-1.5 rounded-sm w-fit transition-colors"
+                >
+                  View Certificate <ExternalLink className="w-3 h-3" />
+                </button>
               </div>
             </MotionWrapper>
           ))}
         </div>
       </div>
+
+      {/* Lightbox Modal */}
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4"
+            onClick={() => setSelectedImage(null)}
+          >
+            <button
+              className="absolute top-6 right-6 text-white hover:text-gray-300 transition-colors"
+              onClick={() => setSelectedImage(null)}
+            >
+              <X className="w-8 h-8" />
+            </button>
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              exit={{ scale: 0.95 }}
+              className="relative w-full max-w-4xl aspect-[4/3] bg-white rounded-sm overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Image
+                src={selectedImage}
+                alt="Certificate"
+                fill
+                className="object-contain"
+              />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

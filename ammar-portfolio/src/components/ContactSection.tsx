@@ -2,7 +2,7 @@
 
 import { siteConfig } from "@/data/site";
 import { MotionWrapper } from "./MotionWrapper";
-import { Mail, Phone, Github, Linkedin, Globe, ArrowUp } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 
 export function ContactSection() {
   const currentYear = new Date().getFullYear();
@@ -12,77 +12,61 @@ export function ContactSection() {
   };
 
   return (
-    <section id="contact" className="pt-24 pb-8 relative z-10 bg-slate-950">
-      <div className="max-w-7xl mx-auto px-6">
+    <section id="contact" className="pt-32 pb-12 relative z-10 bg-[#FAF9F6] border-t border-[#E5E7EB]">
+      <div className="max-w-4xl mx-auto px-6">
         
-        {/* ── Contact CTA Area ── */}
-        <MotionWrapper className="text-center mb-24 max-w-3xl mx-auto">
-          <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight mb-6">
-            Let&apos;s Build Something <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Great</span>
-          </h2>
-          <p className="text-lg text-slate-300 mb-10 leading-relaxed">
-            I am currently open to full-time AI/ML Engineering and Full-Stack Software Development roles. If you&apos;re looking for a dedicated engineer who builds robust, scalable AI systems, let&apos;s connect.
-          </p>
+        {/* Contact CTA Area */}
+        <MotionWrapper>
+          <div className="mb-20">
+            <h2 className="text-3xl lg:text-4xl font-semibold text-[#1A1A1A] tracking-tight mb-4">
+              Have an AI problem worth building?
+            </h2>
+            <p className="text-lg text-[#6B7280] mb-8 max-w-2xl leading-relaxed">
+              I am currently open to full-time AI/ML Engineering roles. If you&apos;re looking for an engineer who focuses on deployable, production-ready systems rather than just notebooks, let&apos;s talk.
+            </p>
 
-          <div className="flex flex-wrap justify-center gap-4">
-            <a
-              href={`mailto:${siteConfig.email}`}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-xl transition-all shadow-lg shadow-blue-500/20"
-            >
-              <Mail className="w-4 h-4" /> Email Me
-            </a>
-            <a
-              href={`tel:${siteConfig.phone}`}
-              className="inline-flex items-center gap-2 px-6 py-3 glass-panel hover:bg-slate-800 text-white font-medium rounded-xl transition-all"
-            >
-              <Phone className="w-4 h-4" /> {siteConfig.phone}
-            </a>
+            <div className="flex flex-wrap gap-4">
+              <a
+                href={`mailto:${siteConfig.email}`}
+                className="inline-flex items-center justify-center px-6 py-3 bg-[#1A1A1A] text-white text-sm font-medium hover:bg-[#2C5545] transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#2C5545]"
+              >
+                Send an email
+              </a>
+              <a
+                href={siteConfig.linkedin}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center justify-center px-6 py-3 bg-white text-[#1A1A1A] border border-[#E5E7EB] text-sm font-medium hover:bg-slate-50 transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#2C5545]"
+              >
+                LinkedIn
+              </a>
+            </div>
           </div>
         </MotionWrapper>
 
-        {/* ── Footer ── */}
-        <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
+        {/* Footer */}
+        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="text-[#6B7280] text-sm">
+            © {currentYear} {siteConfig.shortName}. All rights reserved.
+          </div>
+
+          <div className="flex items-center gap-6">
             <a
               href={siteConfig.github}
               target="_blank"
               rel="noreferrer"
-              className="p-2 text-slate-400 hover:text-white transition-colors"
-              aria-label="GitHub"
+              className="text-sm font-medium text-[#6B7280] hover:text-[#1A1A1A] transition-colors underline underline-offset-4 decoration-transparent hover:decoration-[#1A1A1A]"
             >
-              <Github className="w-5 h-5" />
+              GitHub
             </a>
-            <a
-              href={siteConfig.linkedin}
-              target="_blank"
-              rel="noreferrer"
-              className="p-2 text-slate-400 hover:text-white transition-colors"
-              aria-label="LinkedIn"
+            <button
+              onClick={scrollToTop}
+              className="flex items-center gap-2 text-sm font-medium text-[#6B7280] hover:text-[#1A1A1A] transition-colors focus-visible:outline-none focus-visible:underline"
+              aria-label="Scroll to top"
             >
-              <Linkedin className="w-5 h-5" />
-            </a>
-            <a
-              href={`https://${siteConfig.portfolio}`}
-              target="_blank"
-              rel="noreferrer"
-              className="p-2 text-slate-400 hover:text-white transition-colors"
-              aria-label="Portfolio Website"
-            >
-              <Globe className="w-5 h-5" />
-            </a>
+              Top <ArrowUp className="w-4 h-4" />
+            </button>
           </div>
-
-          <div className="text-slate-500 text-sm text-center">
-            © {currentYear} {siteConfig.shortName} | Crafted with Next.js, Tailwind & Framer Motion
-          </div>
-
-          <button
-            onClick={scrollToTop}
-            className="p-3 rounded-full bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:border-slate-700 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400"
-            aria-label="Scroll to top"
-          >
-            <ArrowUp className="w-4 h-4" />
-          </button>
         </div>
       </div>
     </section>
