@@ -1,7 +1,6 @@
 export interface SkillGroup {
   category: string;
-  icon: string; // descriptive identifier for the component to pick an icon
-  color: string; // tailwind color class prefix like 'blue', 'emerald', 'purple', 'cyan', 'orange', 'rose'
+  icon: string;
   skills: string[];
 }
 
@@ -9,37 +8,26 @@ export const skillGroups: SkillGroup[] = [
   {
     category: 'AI / ML',
     icon: 'brain',
-    color: 'blue',
-    skills: ['Machine Learning', 'Deep Learning', 'Computer Vision', 'NLP', 'LLMs', 'RAG', 'LoRA Fine-Tuning', 'Prompt Engineering', 'Model Evaluation', 'Feature Engineering'],
+    skills: ['Python', 'PyTorch', 'Scikit-learn', 'Computer Vision', 'NLP', 'LLMs', 'RAG', 'LoRA'],
   },
   {
-    category: 'Models & Frameworks',
+    category: 'Models & Retrieval',
     icon: 'layers',
-    color: 'purple',
-    skills: ['YOLOv5', 'YOLOv8', 'YOLOv11', 'BERT', 'GPT-Neo', 'DistilRoBERTa', 'BART-large-MNLI', 'XGBoost', 'Scikit-learn', 'PyTorch', 'Hugging Face', 'SentenceTransformers'],
+    skills: ['YOLOv11', 'BERT', 'GPT-Neo', 'DistilRoBERTa', 'BART-large-MNLI', 'FAISS', 'BM25', 'SentenceTransformers'],
   },
   {
-    category: 'RAG / LLM Tools',
-    icon: 'sparkles',
-    color: 'cyan',
-    skills: ['LangChain', 'FAISS', 'BM25', 'RRF', 'Groq', 'Gemini', 'Hugging Face Inference API', 'pgvector'],
-  },
-  {
-    category: 'Backend',
+    category: 'Backend & Data',
     icon: 'server',
-    color: 'emerald',
-    skills: ['FastAPI', 'REST APIs', 'Node.js', 'Express', 'Supabase', 'PostgreSQL', 'Firebase FCM', 'API Integration'],
+    skills: ['FastAPI', 'REST APIs', 'PostgreSQL', 'Supabase', 'Firebase', 'Node.js'],
   },
   {
     category: 'Frontend',
     icon: 'monitor',
-    color: 'orange',
-    skills: ['React', 'Next.js', 'Tailwind CSS', 'Framer Motion', 'Streamlit', 'Flutter'],
+    skills: ['Flutter', 'React', 'Next.js', 'Streamlit'],
   },
   {
-    category: 'DevOps & Tools',
+    category: 'Infrastructure & Tools',
     icon: 'terminal',
-    color: 'rose',
-    skills: ['Docker', 'Vercel', 'Git', 'GitHub', 'Postman', 'n8n', 'GitHub Actions'],
+    skills: ['Docker', 'Git', 'GitHub Actions', 'Vercel', 'n8n', 'Postman'],
   },
 ];
