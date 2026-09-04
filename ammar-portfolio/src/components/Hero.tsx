@@ -1,16 +1,29 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useEffect, useState } from "react";
 import { siteConfig } from "@/data/site";
 import { Suspense } from "react";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
-
+import { motion, AnimatePresence } from "framer-motion";
 import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
 
 function FacePointCloud() {
   const ref = useRef<THREE.Points>(null);
+  const targetScale = useRef(0.065);
+  
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "+" || e.key === "=") {
+        targetScale.current = Math.min(targetScale.current + 0.015, 0.15);
+      } else if (e.key === "-" || e.key === "_") {
+        targetScale.current = Math.max(targetScale.current - 0.015, 0.03);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
   
   // Load the face model
   const obj = useLoader(OBJLoader, '/face.obj');
@@ -38,6 +51,11 @@ function FacePointCloud() {
 
       // Add a subtle continuous floating animation
       ref.current.position.y = -1.2 + Math.sin(state.clock.elapsedTime) * 0.1;
+
+      // Smooth scale interpolation
+      const currentScale = ref.current.scale.x;
+      const newScale = currentScale + (targetScale.current - currentScale) * 0.1;
+      ref.current.scale.set(newScale, newScale, newScale);
     }
   });
 
@@ -63,6 +81,22 @@ function FacePointCloud() {
 }
 
 export function Hero() {
+  const [showHint, setShowHint] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowHint(false), 8000);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "+" || e.key === "=" || e.key === "-" || e.key === "_") {
+        setShowHint(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   return (
     <section id="home" className="relative pt-24 pb-20 px-6 z-10 overflow-hidden">
       <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
@@ -115,6 +149,27 @@ export function Hero() {
           </Canvas>
           {/* Subtle overlay to soften it */}
           <div className="absolute inset-0 bg-gradient-to-r from-[#FAF9F6] via-transparent to-transparent pointer-events-none" />
+          
+          {/* Elegant interaction hint */}
+          <AnimatePresence>
+            {showHint && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, x: "-50%" }}
+                animate={{ opacity: 1, y: 0, x: "-50%" }}
+                exit={{ opacity: 0, scale: 0.95, x: "-50%" }}
+                transition={{ delay: 2, duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
+                className="absolute bottom-12 left-1/2 z-20 pointer-events-none"
+              >
+                <div className="bg-[#1A1A1A]/90 backdrop-blur-md text-white text-xs font-medium px-4 py-2.5 rounded-full shadow-lg flex items-center gap-3">
+                  <span className="flex gap-1.5">
+                    <kbd className="bg-white/20 px-2 py-0.5 rounded text-[11px] font-sans">+</kbd>
+                    <kbd className="bg-white/20 px-2 py-0.5 rounded text-[11px] font-sans">-</kbd>
+                  </span>
+                  Try zooming
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </section>
