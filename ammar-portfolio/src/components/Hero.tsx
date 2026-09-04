@@ -64,7 +64,7 @@ function FacePointCloud() {
 
 export function Hero() {
   return (
-    <section id="home" className="relative pt-40 pb-20 px-6 z-10 overflow-hidden">
+    <section id="home" className="relative pt-24 pb-20 px-6 z-10 overflow-hidden">
       <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
         {/* LEFT: Editorial Text */}
         <div className="flex flex-col z-10">
