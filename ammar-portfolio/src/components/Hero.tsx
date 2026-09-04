@@ -134,7 +134,6 @@ function InteractiveHint() {
       anchorX="center"
       anchorY="middle"
       fillOpacity={0.9}
-      font="https://fonts.gstatic.com/s/geist/v1/Geist-Medium.woff"
     >
       Try pressing + and -
     </Text>
