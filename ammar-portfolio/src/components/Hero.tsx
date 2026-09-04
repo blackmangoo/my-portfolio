@@ -4,71 +4,140 @@ import { useRef, useMemo, useEffect, useState } from "react";
 import { siteConfig } from "@/data/site";
 import { Suspense } from "react";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { Text } from "@react-three/drei";
 import * as THREE from "three";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
 
-function FloatingHexagons() {
+function NeuralNetwork() {
   const groupRef = useRef<THREE.Group>(null);
-  const hexRefs = useRef<THREE.Mesh[]>([]);
-
-  const hexes = useMemo(() => {
-    return Array.from({ length: 20 }).map(() => ({
-      position: [
-        (Math.random() - 0.5) * 10,
-        (Math.random() - 0.5) * 10,
-        (Math.random() - 0.5) * 8 - 4,
-      ],
-      rotation: [
-        Math.random() * Math.PI,
-        Math.random() * Math.PI,
-        Math.random() * Math.PI,
-      ],
-      scale: Math.random() * 0.15 + 0.05,
-      spinSpeed: {
-        x: (Math.random() - 0.5) * 0.02,
-        y: (Math.random() - 0.5) * 0.02,
-        z: (Math.random() - 0.5) * 0.02,
-      },
-    }));
+  
+  // Input Layer (4), Hidden 1 (6), Hidden 2 (6), Output Layer (2)
+  const layers = [4, 6, 6, 2];
+  const layerSpacing = 2.5;
+  const nodeSpacing = 1.0;
+  
+  const nodes = useMemo(() => {
+    const pts = [];
+    let startX = -(layers.length - 1) * layerSpacing / 2;
+    
+    for (let i = 0; i < layers.length; i++) {
+      const numNodes = layers[i];
+      const startY = -(numNodes - 1) * nodeSpacing / 2;
+      const layerPts = [];
+      for (let j = 0; j < numNodes; j++) {
+        layerPts.push(new THREE.Vector3(
+          startX + (Math.random() - 0.5) * 0.4,
+          startY + j * nodeSpacing + (Math.random() - 0.5) * 0.4,
+          (Math.random() - 0.5) * 1.5 - 1.5 // Placed behind the face
+        ));
+      }
+      pts.push(layerPts);
+      startX += layerSpacing;
+    }
+    return pts;
   }, []);
+
+  const lines = useMemo(() => {
+    const positions = [];
+    for (let i = 0; i < nodes.length - 1; i++) {
+      for (const nodeA of nodes[i]) {
+        for (const nodeB of nodes[i+1]) {
+          // 60% connection probability for a more organic, slightly sparse web
+          if (Math.random() > 0.4) {
+            positions.push(nodeA.x, nodeA.y, nodeA.z);
+            positions.push(nodeB.x, nodeB.y, nodeB.z);
+          }
+        }
+      }
+    }
+    return new Float32Array(positions);
+  }, [nodes]);
+
+  const flatNodes = useMemo(() => {
+    const positions = [];
+    for (const layer of nodes) {
+      for (const node of layer) {
+        positions.push(node.x, node.y, node.z);
+      }
+    }
+    return new Float32Array(positions);
+  }, [nodes]);
 
   useFrame((state) => {
     if (groupRef.current) {
-      // Parallax effect for the hexagons
-      groupRef.current.position.x += (state.pointer.x * 1.5 - groupRef.current.position.x) * 0.05;
-      groupRef.current.position.y += (state.pointer.y * 1.5 - groupRef.current.position.y) * 0.05;
-
-      // Spin individual hexagons
-      hexRefs.current.forEach((mesh, i) => {
-        if (mesh) {
-          mesh.rotation.x += hexes[i].spinSpeed.x;
-          mesh.rotation.y += hexes[i].spinSpeed.y;
-          mesh.rotation.z += hexes[i].spinSpeed.z;
-        }
-      });
+      // Slow organic rotation
+      groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.15) * 0.15;
+      groupRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.3) * 0.2;
+      
+      // Parallax interaction
+      groupRef.current.position.x += (state.pointer.x * 1.0 - groupRef.current.position.x) * 0.05;
+      groupRef.current.position.y += (state.pointer.y * 1.0 - groupRef.current.position.y) * 0.05;
     }
   });
 
   return (
-    <group ref={groupRef}>
-      {hexes.map((hex, i) => (
-        <mesh
-          key={i}
-          ref={(el) => {
-            if (el) hexRefs.current[i] = el;
-          }}
-          position={hex.position as any}
-          rotation={hex.rotation as any}
-          scale={hex.scale}
-        >
-          {/* A cylinder with 6 radial segments is a hexagon. We use a thin height (0.05) to make it a flat hex shape. */}
-          <cylinderGeometry args={[1, 1, 0.05, 6]} />
-          <meshBasicMaterial color="#2C5545" wireframe transparent opacity={0.25} />
-        </mesh>
-      ))}
+    <group ref={groupRef} position={[0, 0, -2]}>
+      <lineSegments>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" args={[lines, 3]} />
+        </bufferGeometry>
+        <lineBasicMaterial color="#2C5545" transparent opacity={0.15} />
+      </lineSegments>
+      <points>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" args={[flatNodes, 3]} />
+        </bufferGeometry>
+        <pointsMaterial size={0.15} color="#2C5545" transparent opacity={0.6} sizeAttenuation={true} />
+      </points>
     </group>
+  );
+}
+
+function InteractiveHint() {
+  const textRef = useRef<any>(null);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    // Keep it visible for 10 seconds unless a key is pressed
+    const timer = setTimeout(() => setVisible(false), 10000);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "+" || e.key === "=" || e.key === "-" || e.key === "_") {
+        setVisible(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
+  useFrame((state) => {
+    if (!textRef.current) return;
+    
+    // Gentle floating
+    textRef.current.position.y = -2.2 + Math.sin(state.clock.elapsedTime * 2.5) * 0.04;
+    
+    // Fade out logic
+    if (!visible) {
+      textRef.current.fillOpacity = THREE.MathUtils.lerp(textRef.current.fillOpacity, 0, 0.05);
+    }
+  });
+
+  return (
+    <Text
+      ref={textRef}
+      position={[0, -2.2, 2.5]}
+      fontSize={0.18}
+      color="#2C5545"
+      anchorX="center"
+      anchorY="middle"
+      fillOpacity={0.9}
+      font="https://fonts.gstatic.com/s/geist/v1/Geist-Medium.woff"
+    >
+      Try pressing + and -
+    </Text>
   );
 }
 
@@ -146,22 +215,6 @@ function FacePointCloud() {
 }
 
 export function Hero() {
-  const [showHint, setShowHint] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShowHint(false), 8000);
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "+" || e.key === "=" || e.key === "-" || e.key === "_") {
-        setShowHint(false);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
-
   return (
     <section id="home" className="relative pt-24 pb-20 px-6 z-10 overflow-hidden">
       <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
@@ -209,33 +262,13 @@ export function Hero() {
         <div className="relative h-[400px] lg:h-[600px] w-full flex items-center justify-center -mr-12 opacity-80 pointer-events-none lg:pointer-events-auto">
           <Canvas camera={{ position: [0, 0, 5], fov: 60 }}>
             <Suspense fallback={null}>
+              <NeuralNetwork />
               <FacePointCloud />
-              <FloatingHexagons />
+              <InteractiveHint />
             </Suspense>
           </Canvas>
           {/* Subtle overlay to soften it */}
           <div className="absolute inset-0 bg-gradient-to-r from-[#FAF9F6] via-transparent to-transparent pointer-events-none" />
-          
-          {/* Elegant interaction hint */}
-          <AnimatePresence>
-            {showHint && (
-              <motion.div
-                initial={{ opacity: 0, y: 10, x: "-50%" }}
-                animate={{ opacity: 1, y: 0, x: "-50%" }}
-                exit={{ opacity: 0, scale: 0.95, x: "-50%" }}
-                transition={{ delay: 2, duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-                className="absolute bottom-12 left-1/2 z-20 pointer-events-none"
-              >
-                <div className="bg-[#1A1A1A]/90 backdrop-blur-md text-white text-xs font-medium px-4 py-2.5 rounded-full shadow-lg flex items-center gap-3">
-                  <span className="flex gap-1.5">
-                    <kbd className="bg-white/20 px-2 py-0.5 rounded text-[11px] font-sans">+</kbd>
-                    <kbd className="bg-white/20 px-2 py-0.5 rounded text-[11px] font-sans">-</kbd>
-                  </span>
-                  Try zooming
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </div>
     </section>
