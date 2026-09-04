@@ -9,6 +9,69 @@ import * as THREE from "three";
 import { motion, AnimatePresence } from "framer-motion";
 import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
 
+function FloatingHexagons() {
+  const groupRef = useRef<THREE.Group>(null);
+  const hexRefs = useRef<THREE.Mesh[]>([]);
+
+  const hexes = useMemo(() => {
+    return Array.from({ length: 20 }).map(() => ({
+      position: [
+        (Math.random() - 0.5) * 10,
+        (Math.random() - 0.5) * 10,
+        (Math.random() - 0.5) * 8 - 4,
+      ],
+      rotation: [
+        Math.random() * Math.PI,
+        Math.random() * Math.PI,
+        Math.random() * Math.PI,
+      ],
+      scale: Math.random() * 0.15 + 0.05,
+      spinSpeed: {
+        x: (Math.random() - 0.5) * 0.02,
+        y: (Math.random() - 0.5) * 0.02,
+        z: (Math.random() - 0.5) * 0.02,
+      },
+    }));
+  }, []);
+
+  useFrame((state) => {
+    if (groupRef.current) {
+      // Parallax effect for the hexagons
+      groupRef.current.position.x += (state.pointer.x * 1.5 - groupRef.current.position.x) * 0.05;
+      groupRef.current.position.y += (state.pointer.y * 1.5 - groupRef.current.position.y) * 0.05;
+
+      // Spin individual hexagons
+      hexRefs.current.forEach((mesh, i) => {
+        if (mesh) {
+          mesh.rotation.x += hexes[i].spinSpeed.x;
+          mesh.rotation.y += hexes[i].spinSpeed.y;
+          mesh.rotation.z += hexes[i].spinSpeed.z;
+        }
+      });
+    }
+  });
+
+  return (
+    <group ref={groupRef}>
+      {hexes.map((hex, i) => (
+        <mesh
+          key={i}
+          ref={(el) => {
+            if (el) hexRefs.current[i] = el;
+          }}
+          position={hex.position as any}
+          rotation={hex.rotation as any}
+          scale={hex.scale}
+        >
+          {/* A cylinder with 6 radial segments is a hexagon. We use a thin height (0.05) to make it a flat hex shape. */}
+          <cylinderGeometry args={[1, 1, 0.05, 6]} />
+          <meshBasicMaterial color="#2C5545" wireframe transparent opacity={0.25} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
 function FacePointCloud() {
   const ref = useRef<THREE.Points>(null);
   const targetScale = useRef(0.065);
@@ -41,16 +104,18 @@ function FacePointCloud() {
 
   useFrame((state, delta) => {
     if (ref.current) {
-      // Prominent parallax effect: aggressive tracking
-      const targetX = (state.pointer.x * Math.PI) / 1.5;
-      const targetY = (state.pointer.y * Math.PI) / 1.5;
+      // Highly sensitive tracking
+      const targetX = (state.pointer.x * Math.PI) / 0.8;
       
-      // Smooth interpolation using lerp
-      ref.current.rotation.y += (targetX - ref.current.rotation.y) * 0.1;
-      ref.current.rotation.x += (-targetY - ref.current.rotation.x) * 0.1;
+      // Shift targetY slightly down (adding an offset) so the mouse points at the nose/eyes instead of lips
+      const targetY = (state.pointer.y * Math.PI) / 0.8 - 0.2;
+      
+      // Fast, smooth interpolation
+      ref.current.rotation.y += (targetX - ref.current.rotation.y) * 0.15;
+      ref.current.rotation.x += (-targetY - ref.current.rotation.x) * 0.15;
 
       // Add a subtle continuous floating animation
-      ref.current.position.y = -1.2 + Math.sin(state.clock.elapsedTime) * 0.1;
+      ref.current.position.y = -1.25 + Math.sin(state.clock.elapsedTime) * 0.1;
 
       // Smooth scale interpolation
       const currentScale = ref.current.scale.x;
@@ -62,7 +127,7 @@ function FacePointCloud() {
   if (positions.length === 0) return null;
 
   return (
-    <points ref={ref} scale={0.065} position={[0, -1.2, 0]}>
+    <points ref={ref} scale={0.065} position={[0, -1.25, 0]}>
       <bufferGeometry>
         <bufferAttribute
           attach="attributes-position"
@@ -145,6 +210,7 @@ export function Hero() {
           <Canvas camera={{ position: [0, 0, 5], fov: 60 }}>
             <Suspense fallback={null}>
               <FacePointCloud />
+              <FloatingHexagons />
             </Suspense>
           </Canvas>
           {/* Subtle overlay to soften it */}
