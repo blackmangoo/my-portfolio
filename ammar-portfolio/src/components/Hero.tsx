@@ -101,9 +101,9 @@ function FacePointCloud() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "+" || e.key === "=") {
-        targetScale.current = Math.min(targetScale.current + 0.015, 0.15);
+        targetScale.current = Math.min(targetScale.current + 0.02, 0.35);
       } else if (e.key === "-" || e.key === "_") {
-        targetScale.current = Math.max(targetScale.current - 0.015, 0.03);
+        targetScale.current = Math.max(targetScale.current - 0.02, 0.001);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
