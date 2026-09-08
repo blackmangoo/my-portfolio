@@ -114,7 +114,7 @@ export const featuredProjects: FeaturedProject[] = [
   {
     title: "AI Job Application Agent",
     description:
-      "An agentic workflow for discovering, evaluating, and assisting with job applications.",
+      "🤖 Autonomous AI Job & Internship Application Agent — Scrapes listings, analyzes eligibility via Groq LLM, fills forms with human-like behavior, and tracks applications in Google Sheets.",
     stack: ["Python", "Groq / LLaMA", "Playwright", "Google Sheets API"],
     highlights: [
       "Job scraping and extraction using browser automation (Playwright).",
@@ -131,20 +131,33 @@ export const featuredProjects: FeaturedProject[] = [
       "Human Review",
       "Application Log"
     ],
-    github: "https://github.com/blackmangoo",
+    github: "https://github.com/blackmangoo/AI-agent-job-automation",
   },
   {
-    title: "MaintainIQ",
+    title: "Protomotive Car Care Studio",
     description:
-      "A hybrid retrieval pipeline combining dense and lexical search to improve technical diagnostic retrieval.",
-    stack: ["FastAPI", "FAISS", "BM25", "Gemini", "Python"],
+      "Premium Detailing & Paint Protection Demo Website featuring high-end animations and smooth scrolling.",
+    stack: ["Next.js 14+", "Tailwind CSS v4", "GSAP", "Lenis"],
     highlights: [
-      "Semantic and lexical retrieval mechanisms (FAISS + BM25).",
-      "Reciprocal Rank Fusion (RRF) for optimal document ranking.",
-      "FastAPI backend for high-throughput search queries.",
-      "Technical documentation processing and chunking strategy."
+      "Smooth scroll integration with Lenis for a premium feel.",
+      "Complex scroll-triggered animations powered by GSAP.",
+      "Modern app-router Next.js 14 architecture.",
+      "Fully responsive and optimized for performance."
     ],
-    github: "https://github.com/blackmangoo",
+    github: "https://github.com/blackmangoo/protomotive-demo",
+  },
+  {
+    title: "Verto Digital Agency Site",
+    description:
+      "Premium agency portfolio site for vertodigital.tech, a digital growth agency serving local businesses in Pakistan.",
+    stack: ["React", "Next.js", "Tailwind CSS", "Framer Motion"],
+    highlights: [
+      "High-conversion landing page design tailored for a digital agency.",
+      "Dynamic Framer Motion interactions and stateful components.",
+      "Optimized SEO and Core Web Vitals for local business reach.",
+      "Clean, maintainable component architecture."
+    ],
+    github: "https://github.com/blackmangoo/verto-digital-site",
   },
 ];
 
@@ -152,8 +165,20 @@ export const featuredProjects: FeaturedProject[] = [
 
 export const minorProjects: MinorProject[] = [
   {
-    title: "Serene",
+    title: "Serene / Mental Health Chatbot",
     tagline: "AI wellness companion with LoRA fine-tuning and local emotion detection.",
+  },
+  {
+    title: "Helmet Detection (YOLOv5)",
+    tagline: "Computer vision model trained to detect safety helmets on construction workers.",
+  },
+  {
+    title: "Mesh Shift Visualizer",
+    tagline: "Interactive web application to visualize complex 3D mesh circular shifts.",
+  },
+  {
+    title: "Heart Disease Prediction",
+    tagline: "Machine learning pipeline to predict disease outcomes based on patient data.",
   },
   {
     title: "NewsLens",
@@ -162,9 +187,5 @@ export const minorProjects: MinorProject[] = [
   {
     title: "TicketIQ",
     tagline: "Zero-shot and few-shot LLM classification for support tickets.",
-  },
-  {
-    title: "Hybrid Travel Recommendation",
-    tagline: "LLM-based recommendation system using FAISS and Annoy semantic retrieval.",
   }
 ];
