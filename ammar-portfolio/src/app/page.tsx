@@ -17,7 +17,7 @@ function AboutSection() {
           <h2 className="text-sm font-semibold text-[#1A1A1A] uppercase tracking-wider mb-6">About</h2>
           <div className="text-lg text-[#1A1A1A] leading-relaxed space-y-6">
             <p>
-              I am a final-year BS Artificial Intelligence student at FAST-NUCES with a strong focus on practical, deployable AI engineering. I like building systems where the model is only one part of the solution.
+              I am a BS Artificial Intelligence graduate from FAST-NUCES with a strong focus on practical, deployable AI engineering. I like building systems where the model is only one part of the solution.
             </p>
             <p>
               My work spans across computer vision, LLM applications, retrieval systems, and backend API architecture. Rather than relying on boilerplate generation, I engineer end-to-end solutions—from data collection and model fine-tuning to building the necessary infrastructure for production deployment.

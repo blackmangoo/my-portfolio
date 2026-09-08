@@ -29,7 +29,7 @@ export const siteConfig = {
   },
   hero: {
     headline: 'AI/ML Engineer building practical machine learning systems.',
-    subheadline: 'BS Artificial Intelligence student at FAST-NUCES focused on computer vision, LLM applications, RAG, and production-oriented AI engineering.',
+    subheadline: 'BS Artificial Intelligence graduate from FAST-NUCES focused on computer vision, LLM applications, RAG, and production-oriented AI engineering.',
     badges: ['Python', 'FastAPI', 'YOLOv11', 'RAG', 'Supabase', 'Flutter', 'Hugging Face', 'Streamlit'],
     cta: 'Open to full-time AI/ML Engineering roles',
   },
