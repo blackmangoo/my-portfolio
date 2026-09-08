@@ -246,14 +246,14 @@ export function Hero() {
                 animate={{ opacity: 1, y: 0, x: "-50%" }}
                 exit={{ opacity: 0, scale: 0.95, x: "-50%" }}
                 transition={{ delay: 1, duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-                className="absolute bottom-12 left-1/2 z-20 pointer-events-none"
+                className="absolute bottom-24 left-1/2 z-20 pointer-events-none"
               >
                 <div className="bg-[#1A1A1A]/90 backdrop-blur-md text-white text-xs font-medium px-4 py-2.5 rounded-full shadow-lg flex items-center gap-3">
                   <span className="flex gap-1.5">
                     <kbd className="bg-white/20 px-2 py-0.5 rounded text-[11px] font-sans">+</kbd>
                     <kbd className="bg-white/20 px-2 py-0.5 rounded text-[11px] font-sans">-</kbd>
                   </span>
-                  Try pressing + and -
+                  Zoom 3D Model
                 </div>
               </motion.div>
             )}
