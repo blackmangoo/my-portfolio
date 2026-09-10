@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Sparkles, X, Send, Bot, ArrowRight } from "lucide-react";
+import { Sparkles, X, Send, Bot, ArrowRight, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Message {
@@ -22,7 +22,7 @@ const KNOWLEDGE_BASE: { keywords: string[]; answer: string; tags: string[]; link
   {
     keywords: ["yolo", "yolov11", "omnidrive", "accuracy", "dataset", "vision"],
     answer:
-      "In OmniDrive AI, Ammar trained and deployed a custom YOLOv11-Large model on 26,820 annotated automotive images across 50 mechanical failure and component classes. It achieved a 99.1% Top-1 accuracy with ~92ms inference latency, integrated directly with a FastAPI inference server.",
+      "In OmniDrive AI, Ammar trained and deployed a custom YOLOv11-Large model on 26,820 annotated automotive images across 50 mechanical failure and component classes. It achieved 99.1% Top-1 accuracy with ~92ms inference latency, integrated directly with a FastAPI inference server.",
     tags: ["Computer Vision", "YOLOv11", "FastAPI"],
     link: { label: "View OmniDrive Project", href: "#projects" },
   },
@@ -63,21 +63,23 @@ const KNOWLEDGE_BASE: { keywords: string[]; answer: string; tags: string[]; link
 
 const SUGGESTIONS = [
   "Explain the OmniDrive YOLOv11 & Kalman setup",
+  "Write me a Python script to scrape a site",
   "What is Ammar's FAST-NUCES background?",
   "Tell me about the AI Job Application Agent",
-  "How does Serene use LoRA fine-tuning?",
+  "Write a quick snake game in Python",
 ];
 
 export function RecruiterAgent() {
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "1",
       sender: "bot",
-      text: "Hello! I am Ammar's AI Twin, grounded in his verified project codebase, FAST-NUCES coursework, and ML engineering benchmarks. What technical details can I clarify for you?",
+      text: "Hello! I am Ammar's AI Twin, powered by Google Gemini and grounded in his verified project codebase, FAST-NUCES education, and ML engineering benchmarks. Ask me anything about his technical work, or about scheduling an interview!",
       timestamp: "Just now",
-      tags: ["FAST-NUCES", "YOLOv11", "Kalman Filter", "RAG"],
+      tags: ["Gemini AI", "FAST-NUCES", "YOLOv11", "Kalman Filter"],
     },
   ]);
 
@@ -89,11 +91,11 @@ export function RecruiterAgent() {
 
   useEffect(() => {
     if (isOpen) scrollToBottom();
-  }, [messages, isOpen]);
+  }, [messages, isOpen, isLoading]);
 
-  const handleSend = (textToSend?: string) => {
+  const handleSend = async (textToSend?: string) => {
     const query = (textToSend || input).trim();
-    if (!query) return;
+    if (!query || isLoading) return;
 
     const userMsg: Message = {
       id: nextMessageId(),
@@ -102,16 +104,49 @@ export function RecruiterAgent() {
       timestamp: "Just now",
     };
 
-    setMessages((prev) => [...prev, userMsg]);
+    const newMessages = [...messages, userMsg];
+    setMessages(newMessages);
     if (!textToSend) setInput("");
+    setIsLoading(true);
 
-    // Query matching
-    const qLower = query.toLowerCase();
-    const bestMatch = KNOWLEDGE_BASE.find((entry) =>
-      entry.keywords.some((kw) => qLower.includes(kw))
-    );
+    try {
+      // Call our Next.js backend endpoint connected to Gemini
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: newMessages.slice(-6).map((m) => ({
+            sender: m.sender,
+            text: m.text,
+          })),
+        }),
+      });
 
-    setTimeout(() => {
+      if (!res.ok) {
+        throw new Error(`API responded with status ${res.status}`);
+      }
+
+      const data = await res.json();
+      if (data.reply) {
+        const botResponse: Message = {
+          id: nextMessageId(),
+          sender: "bot",
+          text: data.reply,
+          timestamp: "Just now",
+          tags: ["Gemini 3.6 Flash", "AI Assistant"],
+        };
+        setMessages((prev) => [...prev, botResponse]);
+        return;
+      }
+      throw new Error("No reply received");
+    } catch (err) {
+      console.warn("Falling back to local knowledge base:", err);
+      // Seamless fallback to local grounded knowledge base
+      const qLower = query.toLowerCase();
+      const bestMatch = KNOWLEDGE_BASE.find((entry) =>
+        entry.keywords.some((kw) => qLower.includes(kw))
+      );
+
       const botResponse: Message = bestMatch
         ? {
             id: nextMessageId(),
@@ -124,14 +159,16 @@ export function RecruiterAgent() {
         : {
             id: nextMessageId(),
             sender: "bot",
-            text: "Ammar is a FAST-NUCES AI graduate specializing in Computer Vision (YOLOv11), sensor fusion (Kalman filters), RAG pipelines, and full-stack FastAPI architectures. Try asking about OmniDrive, his Autonomous Job Agent, or his LoRA fine-tuning work!",
+            text: "Nice try! 🤖 My GPU cycles are strictly reserved for showcasing Ammar's portfolio. I don't write generic scripts or do homework—unless your homework is hiring an exceptional FAST-NUCES AI engineer! What would you like to know about his machine learning work?",
             timestamp: "Just now",
-            tags: ["AI Engineering", "Computer Vision", "FastAPI"],
-            actionLink: { label: "Send Ammar an Email", href: "mailto:ammar.akbar2002@gmail.com" },
+            tags: ["AI Assistant", "Portfolio Guardian"],
+            actionLink: { label: "Contact Ammar for Hire", href: "mailto:ammar.akbar2002@gmail.com" },
           };
 
       setMessages((prev) => [...prev, botResponse]);
-    }, 280);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -143,7 +180,7 @@ export function RecruiterAgent() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.96 }}
             transition={{ type: "spring", damping: 25, stiffness: 350 }}
-            className="w-[92vw] sm:w-[420px] h-[520px] bg-[var(--color-panel)] border border-[var(--color-border)] rounded-md shadow-2xl flex flex-col overflow-hidden mb-3"
+            className="w-[92vw] sm:w-[440px] h-[540px] bg-[var(--color-panel)] border border-[var(--color-border)] rounded-md shadow-2xl flex flex-col overflow-hidden mb-3"
           >
             {/* Header */}
             <div className="px-4 py-3 bg-[var(--color-foreground)] text-[var(--color-background)] flex items-center justify-between">
@@ -153,10 +190,10 @@ export function RecruiterAgent() {
                 </div>
                 <div>
                   <div className="text-xs font-semibold flex items-center gap-1.5">
-                    <span>Ammar&apos;s AI Twin</span>
+                    <span>Ammar&apos;s AI Assistant</span>
                     <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                   </div>
-                  <div className="text-[10px] text-white/70 font-mono">Grounded Technical Assistant</div>
+                  <div className="text-[10px] text-white/70 font-mono">Powered by Gemini 3.6 Flash</div>
                 </div>
               </div>
               <button
@@ -174,7 +211,8 @@ export function RecruiterAgent() {
                 <button
                   key={i}
                   onClick={() => handleSend(sugg)}
-                  className="px-2.5 py-1 bg-[var(--color-panel)] border border-[var(--color-border)] hover:border-[var(--color-accent)] text-[var(--color-foreground)] rounded-full whitespace-nowrap transition-colors"
+                  disabled={isLoading}
+                  className="px-2.5 py-1 bg-[var(--color-panel)] border border-[var(--color-border)] hover:border-[var(--color-accent)] text-[var(--color-foreground)] rounded-full whitespace-nowrap transition-colors disabled:opacity-50"
                 >
                   {sugg}
                 </button>
@@ -189,10 +227,10 @@ export function RecruiterAgent() {
                   className={`flex flex-col ${msg.sender === "user" ? "items-end" : "items-start"}`}
                 >
                   <div
-                    className={`max-w-[85%] p-3.5 rounded-md leading-relaxed ${
+                    className={`max-w-[88%] p-3.5 rounded-md leading-relaxed whitespace-pre-wrap ${
                       msg.sender === "user"
                         ? "bg-[var(--color-foreground)] text-[var(--color-background)] rounded-br-none"
-                        : "bg-[var(--color-background)] border border-[var(--color-border)] text-[var(--color-foreground)] rounded-bl-none"
+                        : "bg-[var(--color-background)] border border-[var(--color-border)] text-[var(--color-foreground)] rounded-bl-none shadow-sm"
                     }`}
                   >
                     <p>{msg.text}</p>
@@ -224,6 +262,15 @@ export function RecruiterAgent() {
                   )}
                 </div>
               ))}
+
+              {/* Live Loading Indicator */}
+              {isLoading && (
+                <div className="flex items-center gap-2 p-3 bg-[var(--color-background)] border border-[var(--color-border)] rounded-md w-fit text-[var(--color-muted)]">
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-[var(--color-accent)]" />
+                  <span className="text-[11px] font-mono">Thinking as Ammar&apos;s Assistant...</span>
+                </div>
+              )}
+
               <div ref={messagesEndRef} />
             </div>
 
@@ -239,12 +286,13 @@ export function RecruiterAgent() {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about YOLOv11, Kalman math, FAST-NUCES..."
-                className="flex-1 px-3 py-2 text-xs bg-[var(--color-panel)] border border-[var(--color-border)] rounded-sm text-[var(--color-foreground)] placeholder-[var(--color-muted)] focus:outline-none focus:border-[var(--color-accent)] min-h-[40px]"
+                placeholder="Ask about YOLOv11, Kalman math, hiring..."
+                disabled={isLoading}
+                className="flex-1 px-3 py-2 text-xs bg-[var(--color-panel)] border border-[var(--color-border)] rounded-sm text-[var(--color-foreground)] placeholder-[var(--color-muted)] focus:outline-none focus:border-[var(--color-accent)] min-h-[40px] disabled:opacity-60"
               />
               <button
                 type="submit"
-                disabled={!input.trim()}
+                disabled={!input.trim() || isLoading}
                 className="p-2.5 bg-[var(--color-foreground)] text-[var(--color-background)] hover:bg-[var(--color-accent)] disabled:opacity-40 transition-colors rounded-sm min-h-[40px] min-w-[40px] flex items-center justify-center"
                 aria-label="Send query"
               >
@@ -262,7 +310,7 @@ export function RecruiterAgent() {
         aria-label="Open AI Assistant"
       >
         <Sparkles className="w-4 h-4 text-emerald-400" />
-        <span className="font-mono">Ask AI Twin</span>
+        <span className="font-mono">Ask AI Assistant</span>
       </button>
     </aside>
   );

@@ -99,37 +99,48 @@ export function OmniDriveExplorer() {
     if (!ctx) return;
 
     let animationFrameId: number;
-    const historyLength = 120;
+    const historyLength = 140;
     const rawHistory: number[] = [];
     const kalmanHistory: number[] = [];
 
     let currentTrueSpeed = 60;
     let kalmanState = 60;
     let kalmanCov = 1.0;
-    const Q = 0.05; // process noise
-    const R = 4.0;  // measurement noise
+    const Q = 0.02; // Process variance (true vehicle acceleration)
+    const R = 18.0; // Measurement variance (sensor noise)
+
+    let frameCount = 0;
+    const updateEveryNFrames = 3; // Throttles updates to ~20Hz (matching OBD-II sample rate)
 
     const render = () => {
       if (isRunning) {
-        // True speed subtle wander
-        currentTrueSpeed += (Math.random() - 0.5) * 0.8;
-        currentTrueSpeed = Math.max(30, Math.min(90, currentTrueSpeed));
+        frameCount++;
 
-        // Simulated noisy sensor measurement
-        const noise = (Math.random() - 0.5) * 8.0;
-        const noisyMeasurement = currentTrueSpeed + noise;
+        if (frameCount % updateEveryNFrames === 0) {
+          // Slow organic true vehicle velocity wander
+          currentTrueSpeed += (Math.random() - 0.5) * 0.9;
+          currentTrueSpeed = Math.max(35, Math.min(85, currentTrueSpeed));
 
-        // Kalman Update
-        kalmanCov += Q;
-        const K = kalmanCov / (kalmanCov + R);
-        kalmanState += K * (noisyMeasurement - kalmanState);
-        kalmanCov *= (1.0 - K);
+          // Substantially amplified raw sensor jitter with realistic spikes
+          let noise = (Math.random() - 0.5) * 24.0;
+          if (Math.random() > 0.78) {
+            // Occasional accelerometer road bump / CAN-bus electrical glitch
+            noise += (Math.random() - 0.5) * 16.0;
+          }
+          const noisyMeasurement = currentTrueSpeed + noise;
 
-        rawHistory.push(noisyMeasurement);
-        kalmanHistory.push(kalmanState);
+          // 1D Kalman Predict & Update cycle
+          kalmanCov += Q;
+          const K = kalmanCov / (kalmanCov + R);
+          kalmanState += K * (noisyMeasurement - kalmanState);
+          kalmanCov *= (1.0 - K);
 
-        if (rawHistory.length > historyLength) rawHistory.shift();
-        if (kalmanHistory.length > historyLength) kalmanHistory.shift();
+          rawHistory.push(noisyMeasurement);
+          kalmanHistory.push(kalmanState);
+
+          if (rawHistory.length > historyLength) rawHistory.shift();
+          if (kalmanHistory.length > historyLength) kalmanHistory.shift();
+        }
       }
 
       // Draw canvas
@@ -138,27 +149,28 @@ export function OmniDriveExplorer() {
       ctx.clearRect(0, 0, width, height);
 
       // Background grid lines
-      ctx.strokeStyle = "rgba(100, 100, 100, 0.12)";
+      ctx.strokeStyle = "rgba(120, 120, 120, 0.12)";
       ctx.lineWidth = 1;
-      for (let y = 20; y < height; y += 25) {
+      for (let y = 15; y < height; y += 28) {
         ctx.beginPath();
         ctx.moveTo(0, y);
         ctx.lineTo(width, y);
         ctx.stroke();
       }
 
-      // Map value to canvas Y
-      const minY = 20;
-      const maxY = 100;
+      // Dynamic coordinate mapping with safety headroom
+      const minY = 10;
+      const maxY = 110;
       const getY = (val: number) => height - ((val - minY) / (maxY - minY)) * height;
+      const stepX = width / (historyLength - 1);
 
-      // Draw Raw Noisy Sensor Line (Orange / Muted Grey dashed)
+      // 1. Draw Raw Noisy Sensor Line (High-contrast dashed orange with visible jitter)
       if (rawHistory.length > 1) {
         ctx.beginPath();
-        ctx.setLineDash([3, 3]);
-        ctx.strokeStyle = "rgba(220, 100, 60, 0.65)";
-        ctx.lineWidth = 1.5;
-        const stepX = width / (historyLength - 1);
+        ctx.setLineDash([4, 3]);
+        ctx.strokeStyle = "rgba(249, 115, 22, 0.75)";
+        ctx.lineWidth = 1.8;
+        ctx.shadowBlur = 0;
         for (let i = 0; i < rawHistory.length; i++) {
           const x = i * stepX;
           const y = getY(rawHistory[i]);
@@ -166,15 +178,26 @@ export function OmniDriveExplorer() {
           else ctx.lineTo(x, y);
         }
         ctx.stroke();
+
+        // Draw small indicator dots on recent noisy spikes
+        ctx.fillStyle = "rgba(249, 115, 22, 0.6)";
+        for (let i = Math.max(0, rawHistory.length - 25); i < rawHistory.length; i += 2) {
+          const x = i * stepX;
+          const y = getY(rawHistory[i]);
+          ctx.beginPath();
+          ctx.arc(x, y, 2.0, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
 
-      // Draw Kalman Smoothed Output (Emerald Green solid)
+      // 2. Draw Kalman Smoothed Output (Vibrant glowing solid emerald green)
       if (kalmanHistory.length > 1) {
         ctx.beginPath();
         ctx.setLineDash([]);
         ctx.strokeStyle = "#10B981";
-        ctx.lineWidth = 2.5;
-        const stepX = width / (historyLength - 1);
+        ctx.lineWidth = 2.8;
+        ctx.shadowColor = "#10B981";
+        ctx.shadowBlur = 8;
         for (let i = 0; i < kalmanHistory.length; i++) {
           const x = i * stepX;
           const y = getY(kalmanHistory[i]);
@@ -182,6 +205,7 @@ export function OmniDriveExplorer() {
           else ctx.lineTo(x, y);
         }
         ctx.stroke();
+        ctx.shadowBlur = 0; // Reset shadow for next render pass
       }
 
       animationFrameId = requestAnimationFrame(render);
