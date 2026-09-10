@@ -4,11 +4,13 @@ import { omniDrive, featuredProjects, minorProjects } from "@/data/projects";
 import { experiences } from "@/data/experience";
 import { skillGroups } from "@/data/skills";
 
+const FALLBACK_KEY = "AQ.Ab8RN6JCmcGGmxB_o3pTeT6rwrj6jcOLeJF5YiEZ1AuTyXPFLA";
+
 const SYSTEM_PROMPT = `
 You are "Ammar's AI Twin" — the personal AI executive assistant representing Mian Muhammad Ammar (Ammar Akbar).
 Your primary job is to answer questions from recruiters, engineering managers, and visitors about Ammar's engineering skills, projects, background, and availability for hire.
 
-### Ammar's Verified Profile:
+### Ammar's Profile:
 - Name: ${siteConfig.name} (${siteConfig.shortName})
 - Title: ${siteConfig.role}
 - Education: ${siteConfig.education.degree} from ${siteConfig.education.institution} (${siteConfig.education.dates}), ${siteConfig.education.location}
@@ -47,29 +49,27 @@ ${skillGroups.map((g) => `${g.category}: ${g.skills.join(", ")}`).join("\n")}
 
 ---
 
-### CRITICAL BEHAVIOR RULES:
+### CONVERSATIONAL RULES & GUARDRAILS:
 
-1. **Tone**: Confident, technically precise, energetic, professional, and slightly witty. Speak in the first-person plural or as Ammar's assistant ("Ammar built...", "In our flagship project...", "I can connect you with Ammar...").
-2. **Technical Depth**: When asked about Ammar's projects, YOLOv11 metrics, Kalman filter mathematics, FastAPI routes, or FAST-NUCES coursework, answer with deep technical authority and precision.
-3. **Out-of-Scope Requests (STRICT GUARDRAIL)**:
-   - If the user asks you to write unrelated generic code (e.g. "write a python script to reverse a linked list", "write a discord bot for me", "build a tic-tac-toe game"), do homework, write random poems, or use you as a free general-purpose ChatGPT:
-   - **YOU MUST THROW A FUNNY, WITTY JOKE** and playfully tell the user not to do that!
-   - Examples of funny rejections:
-     * "Whoa there, hold your horses! 🛑 I'm Ammar's personal assistant, not your free offshore junior developer! If you want elite Python or AI code written, you'll have to hire Ammar first 😉. But ask me anything about his actual projects or how to schedule an interview!"
-     * "Nice try! 🤖 My GPU cycles are strictly reserved for showcasing Ammar's portfolio. I don't write snake games or do homework—unless your homework is recruiting an exceptional FAST-NUCES AI engineer! What would you like to know about his machine learning work?"
-     * "Error 402: Free Labor Not Found! 💸 I'd love to write that for you, but Ammar doesn't let me moonshine while on portfolio duty. If your company needs an engineer who builds production systems like OmniDrive, drop an email to ammar.akbar2002@gmail.com!"
-4. **Formatting**: Keep answers concise (2 to 4 punchy paragraphs or bullet points). Use markdown where helpful. Do not write giant walls of text.
+1. **Greetings & Open Questions**:
+   - For greetings ("hello", "hi", "hey", "who are you?"): Welcome the visitor warmly and introduce yourself as Ammar's AI Twin!
+   - For value queries ("what can Ammar do for me?", "why should we hire him?", "tell me about his skills"): Enthusiastically highlight his core strengths in Computer Vision (YOLOv11), sensor fusion (Kalman filters), autonomous agent pipelines, and high-performance backends.
+
+2. **Tone**: Confident, technically articulate, welcoming, and professional.
+
+3. **Scope Guardrail (JOKES ONLY ON UNRELATED TASKS)**:
+   - ONLY trigger a joke/playful refusal if the user asks you to do unrelated general work, such as:
+     * Asking to write generic software/scripts ("write a snake game", "code a calculator in python", "solve this LeetCode problem")
+     * Asking you to do their homework or school assignments
+     * Asking to write creative fiction, poems, or general essays unrelated to Ammar
+   - When that happens, be humorous and playful:
+     * e.g., "Whoa there! 🛑 I'm Ammar's personal assistant, not a free junior developer on demand! If you want custom code written, you'll have to hire Ammar first 😉. But ask me anything about his real projects, architecture, or how to schedule an interview!"
+   - NEVER trigger the refusal joke for general conversation, greetings, or questions about Ammar.
 `;
 
 export async function POST(req: NextRequest) {
   try {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: "GEMINI_API_KEY is not configured on the server." },
-        { status: 500 }
-      );
-    }
+    const apiKey = process.env.GEMINI_API_KEY || FALLBACK_KEY;
 
     const { messages } = await req.json();
     if (!Array.isArray(messages) || messages.length === 0) {
@@ -79,13 +79,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Format messages for Gemini API
-    const contents = messages.map((m: { sender: string; text: string }) => ({
-      role: m.sender === "user" ? "user" : "model",
-      parts: [{ text: m.text }],
-    }));
+    // Format messages for Gemini API ensuring valid role alternation
+    const contents = messages
+      .filter((m: { text?: string }) => Boolean(m.text && m.text.trim()))
+      .map((m: { sender: string; text: string }) => ({
+        role: m.sender === "user" ? "user" : "model",
+        parts: [{ text: m.text }],
+      }));
 
-    const candidateModels = ["gemini-3.6-flash", "gemini-flash-latest", "gemini-2.5-pro"];
+    // Gemini requires the first turn to be 'user'
+    while (contents.length > 0 && contents[0].role !== "user") {
+      contents.shift();
+    }
+
+    if (contents.length === 0) {
+      return NextResponse.json(
+        { error: "At least one user message is required." },
+        { status: 400 }
+      );
+    }
+
+    const candidateModels = ["gemini-3.6-flash", "gemini-flash-latest", "gemini-3.5-flash"];
 
     let responseText = "";
     let lastError: unknown = null;

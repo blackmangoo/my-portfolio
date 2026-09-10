@@ -20,6 +20,20 @@ function nextMessageId(): string {
 
 const KNOWLEDGE_BASE: { keywords: string[]; answer: string; tags: string[]; link?: { label: string; href: string } }[] = [
   {
+    keywords: ["hello", "hi", "hey", "greetings", "who are you", "introduce"],
+    answer:
+      "Hello! 👋 I'm Ammar's AI Twin and personal assistant representing Mian Muhammad Ammar (Ammar Akbar). Ammar is a BS Artificial Intelligence graduate from FAST-NUCES who is currently open to full-time AI/ML Engineering roles. How can I help you explore his work?",
+    tags: ["Ammar's Assistant", "AI/ML Engineer"],
+    link: { label: "Explore Projects", href: "#projects" },
+  },
+  {
+    keywords: ["what can ammar do", "do for me", "why hire", "value", "capabilities", "what can you do"],
+    answer:
+      "Ammar takes machine learning from raw data and model weights all the way to production deployment. Here is what he brings to your engineering team:\n\n1. 👁️ Advanced Computer Vision: Fine-tuning and deploying custom YOLOv11 architectures (achieved 99.1% Top-1 accuracy on 26k images).\n2. ⚡ Real-Time Sensor Fusion: Implementing mathematical 1D Kalman filters to denoise 20Hz high-frequency CAN bus telemetry.\n3. 🧠 Autonomous Agents & RAG: Multi-step browser automation (Playwright + LLaMA-3), LoRA fine-tuning, and semantic retrieval via pgvector.\n4. 🚀 High-Throughput Backends: Asynchronous FastAPI microservices maintaining sub-15ms p95 latency guarantees.",
+    tags: ["Computer Vision", "Sensor Fusion", "LLM Agents", "FastAPI"],
+    link: { label: "Schedule an Interview", href: "#contact" },
+  },
+  {
     keywords: ["yolo", "yolov11", "omnidrive", "accuracy", "dataset", "vision"],
     answer:
       "In OmniDrive AI, Ammar trained and deployed a custom YOLOv11-Large model on 26,820 annotated automotive images across 50 mechanical failure and component classes. It achieved 99.1% Top-1 accuracy with ~92ms inference latency, integrated directly with a FastAPI inference server.",
@@ -59,14 +73,21 @@ const KNOWLEDGE_BASE: { keywords: string[]; answer: string; tags: string[]; link
     tags: ["Available for Hire", "Full-Time"],
     link: { label: "Jump to Contact", href: "#contact" },
   },
+  {
+    keywords: ["snake", "game", "write a script", "write me a", "homework", "write code", "code for me", "build me an app"],
+    answer:
+      "Whoa there! 🛑 I'm Ammar's personal assistant, not a free junior developer on demand! If you want custom code written, you'll have to hire Ammar first 😉. In the meantime, ask me anything about his real projects, engineering architecture, or how to set up an interview!",
+    tags: ["Assistant Guardian", "Hire Ammar"],
+    link: { label: "Contact Ammar for Hire", href: "#contact" },
+  },
 ];
 
 const SUGGESTIONS = [
+  "What can Ammar do for my team?",
   "Explain the OmniDrive YOLOv11 & Kalman setup",
-  "Write me a Python script to scrape a site",
   "What is Ammar's FAST-NUCES background?",
   "Tell me about the AI Job Application Agent",
-  "Write a quick snake game in Python",
+  "Write me a Python script to play snake",
 ];
 
 export function RecruiterAgent() {
@@ -79,7 +100,7 @@ export function RecruiterAgent() {
       sender: "bot",
       text: "Hello! I am Ammar's AI Twin, powered by Google Gemini and grounded in his verified project codebase, FAST-NUCES education, and ML engineering benchmarks. Ask me anything about his technical work, or about scheduling an interview!",
       timestamp: "Just now",
-      tags: ["Gemini AI", "FAST-NUCES", "YOLOv11", "Kalman Filter"],
+      tags: ["Gemini 3.6 Flash", "FAST-NUCES", "AI Engineer"],
     },
   ]);
 
@@ -159,10 +180,10 @@ export function RecruiterAgent() {
         : {
             id: nextMessageId(),
             sender: "bot",
-            text: "Nice try! 🤖 My GPU cycles are strictly reserved for showcasing Ammar's portfolio. I don't write generic scripts or do homework—unless your homework is hiring an exceptional FAST-NUCES AI engineer! What would you like to know about his machine learning work?",
+            text: "Ammar is an AI/ML Engineer from FAST-NUCES specializing in Computer Vision (YOLOv11), sensor fusion (Kalman filters), RAG pipelines, and full-stack FastAPI architectures. Ask me about any of his projects, skills, or scheduling an interview!",
             timestamp: "Just now",
-            tags: ["AI Assistant", "Portfolio Guardian"],
-            actionLink: { label: "Contact Ammar for Hire", href: "mailto:ammar.akbar2002@gmail.com" },
+            tags: ["AI Assistant", "FAST-NUCES"],
+            actionLink: { label: "Contact Ammar for Hire", href: "#contact" },
           };
 
       setMessages((prev) => [...prev, botResponse]);
