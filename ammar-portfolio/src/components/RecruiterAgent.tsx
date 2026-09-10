@@ -18,20 +18,28 @@ function nextMessageId(): string {
   return `msg_${++messageCounter}`;
 }
 
+// Grounded local answers when API is unreachable or during offline usage
 const KNOWLEDGE_BASE: { keywords: string[]; answer: string; tags: string[]; link?: { label: string; href: string } }[] = [
   {
-    keywords: ["hello", "hi", "hey", "greetings", "who are you", "introduce"],
+    keywords: ["git", "github", "version control", "docker", "tools", "ci/cd"],
     answer:
-      "Hello! 👋 I'm Ammar's AI Twin and personal assistant representing Mian Muhammad Ammar (Ammar Akbar). Ammar is a BS Artificial Intelligence graduate from FAST-NUCES who is currently open to full-time AI/ML Engineering roles. How can I help you explore his work?",
-    tags: ["Ammar's Assistant", "AI/ML Engineer"],
+      "Yes, absolutely! Ammar uses Git and GitHub extensively across all his production systems and open-source repositories. His workflow includes branching strategies, GitHub Actions CI/CD pipelines, Docker containerization, and automated deployment.",
+    tags: ["Git", "GitHub Actions", "Docker", "DevOps"],
+    link: { label: "Visit Ammar's GitHub", href: "https://github.com/blackmangoo" },
+  },
+  {
+    keywords: ["hello", "hi", "hey", "greetings", "good morning", "good evening", "who are you"],
+    answer:
+      "Hey there! 👋 Welcome! I'm Ammar's AI assistant representing Mian Muhammad Ammar (Ammar Akbar). Ammar is a BS Artificial Intelligence graduate from FAST-NUCES actively seeking full-time AI/ML Engineering and Full-Stack AI Developer roles. How can I help you explore his work today?",
+    tags: ["Ammar's Assistant", "FAST-NUCES", "AI/ML"],
     link: { label: "Explore Projects", href: "#projects" },
   },
   {
-    keywords: ["what can ammar do", "do for me", "why hire", "value", "capabilities", "what can you do"],
+    keywords: ["what can ammar do", "do for me", "why hire", "value", "capabilities", "skills", "experience"],
     answer:
-      "Ammar takes machine learning from raw data and model weights all the way to production deployment. Here is what he brings to your engineering team:\n\n1. 👁️ Advanced Computer Vision: Fine-tuning and deploying custom YOLOv11 architectures (achieved 99.1% Top-1 accuracy on 26k images).\n2. ⚡ Real-Time Sensor Fusion: Implementing mathematical 1D Kalman filters to denoise 20Hz high-frequency CAN bus telemetry.\n3. 🧠 Autonomous Agents & RAG: Multi-step browser automation (Playwright + LLaMA-3), LoRA fine-tuning, and semantic retrieval via pgvector.\n4. 🚀 High-Throughput Backends: Asynchronous FastAPI microservices maintaining sub-15ms p95 latency guarantees.",
+      "Ammar bridges machine learning research and low-latency production engineering. Here is what he brings to your team:\n\n1. 👁️ Computer Vision: Custom YOLOv11 architectures (99.1% Top-1 accuracy on 26k images, ~92ms latency).\n2. ⚡ Real-Time Sensor Fusion: 1D Kalman filters denoising 20Hz CAN-bus telemetry in <1ms.\n3. 🧠 LLM Agents & RAG: Autonomous browser automation (Playwright + LLaMA-3), LoRA fine-tuning, and pgvector semantic retrieval.\n4. 🚀 High-Throughput Backends: Asynchronous FastAPI microservices with sub-15ms p95 latency.",
     tags: ["Computer Vision", "Sensor Fusion", "LLM Agents", "FastAPI"],
-    link: { label: "Schedule an Interview", href: "#contact" },
+    link: { label: "Contact for Interview", href: "#contact" },
   },
   {
     keywords: ["yolo", "yolov11", "omnidrive", "accuracy", "dataset", "vision"],
@@ -73,21 +81,23 @@ const KNOWLEDGE_BASE: { keywords: string[]; answer: string; tags: string[]; link
     tags: ["Available for Hire", "Full-Time"],
     link: { label: "Jump to Contact", href: "#contact" },
   },
-  {
-    keywords: ["snake", "game", "write a script", "write me a", "homework", "write code", "code for me", "build me an app"],
-    answer:
-      "Whoa there! 🛑 I'm Ammar's personal assistant, not a free junior developer on demand! If you want custom code written, you'll have to hire Ammar first 😉. In the meantime, ask me anything about his real projects, engineering architecture, or how to set up an interview!",
-    tags: ["Assistant Guardian", "Hire Ammar"],
-    link: { label: "Contact Ammar for Hire", href: "#contact" },
-  },
+];
+
+// Patterns that are genuinely asking for free coding / homework / script generation
+const UNRELATED_CODE_PATTERNS = [
+  /write\s+(me\s+)?(a\s+)?(python|js|javascript|code|script|program|bot|app|game)/i,
+  /code\s+(me\s+)?(a\s+)?(game|calculator|bot|app|script)/i,
+  /build\s+(me\s+)?(a\s+)?(snake|game|calculator|bot|app|website)/i,
+  /solve\s+(this\s+)?(leetcode|homework|assignment|exam)/i,
+  /do\s+my\s+(homework|assignment|exam|project)/i,
 ];
 
 const SUGGESTIONS = [
+  "Does Ammar know Git and Docker?",
   "What can Ammar do for my team?",
   "Explain the OmniDrive YOLOv11 & Kalman setup",
   "What is Ammar's FAST-NUCES background?",
   "Tell me about the AI Job Application Agent",
-  "Write me a Python script to play snake",
 ];
 
 export function RecruiterAgent() {
@@ -98,9 +108,9 @@ export function RecruiterAgent() {
     {
       id: "1",
       sender: "bot",
-      text: "Hello! I am Ammar's AI Twin, powered by Google Gemini and grounded in his verified project codebase, FAST-NUCES education, and ML engineering benchmarks. Ask me anything about his technical work, or about scheduling an interview!",
+      text: "Hello! I am Ammar's AI Assistant, powered by Google Gemini and grounded in his verified projects, FAST-NUCES degree, and technical toolkit. Ask me anything about his skills, experience, or hiring details!",
       timestamp: "Just now",
-      tags: ["Gemini 3.6 Flash", "FAST-NUCES", "AI Engineer"],
+      tags: ["Gemini AI", "FAST-NUCES", "AI Engineer"],
     },
   ]);
 
@@ -131,7 +141,6 @@ export function RecruiterAgent() {
     setIsLoading(true);
 
     try {
-      // Call our Next.js backend endpoint connected to Gemini
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -161,8 +170,25 @@ export function RecruiterAgent() {
       }
       throw new Error("No reply received");
     } catch (err) {
-      console.warn("Falling back to local knowledge base:", err);
-      // Seamless fallback to local grounded knowledge base
+      console.warn("Using local grounded knowledge base:", err);
+
+      // ONLY throw the playful refusal joke if the user explicitly asked to write unrelated code/homework
+      const isAskingForUnrelatedCode = UNRELATED_CODE_PATTERNS.some((pattern) => pattern.test(query));
+
+      if (isAskingForUnrelatedCode) {
+        const jokeResponse: Message = {
+          id: nextMessageId(),
+          sender: "bot",
+          text: "Whoa there! 🛑 I'm Ammar's personal assistant, not a free junior developer on demand! If you want custom code or apps written, you'll have to hire Ammar first 😉. But ask me anything about his real projects, architecture, or how to schedule an interview!",
+          timestamp: "Just now",
+          tags: ["Assistant Guardian", "Hire Ammar"],
+          actionLink: { label: "Contact Ammar for Hire", href: "#contact" },
+        };
+        setMessages((prev) => [...prev, jokeResponse]);
+        return;
+      }
+
+      // Normal queries & greetings: match knowledge base or give helpful response
       const qLower = query.toLowerCase();
       const bestMatch = KNOWLEDGE_BASE.find((entry) =>
         entry.keywords.some((kw) => qLower.includes(kw))
@@ -180,7 +206,7 @@ export function RecruiterAgent() {
         : {
             id: nextMessageId(),
             sender: "bot",
-            text: "Ammar is an AI/ML Engineer from FAST-NUCES specializing in Computer Vision (YOLOv11), sensor fusion (Kalman filters), RAG pipelines, and full-stack FastAPI architectures. Ask me about any of his projects, skills, or scheduling an interview!",
+            text: `Ammar is an AI/ML Engineer from FAST-NUCES specializing in Computer Vision (YOLOv11), sensor fusion (Kalman filters), autonomous agent pipelines, and high-performance FastAPI backends.\n\nHe is proficient with Git, GitHub Actions, Docker, PyTorch, Supabase, Flutter, and Next.js. What specific aspect of his work would you like to know more about?`,
             timestamp: "Just now",
             tags: ["AI Assistant", "FAST-NUCES"],
             actionLink: { label: "Contact Ammar for Hire", href: "#contact" },
@@ -256,7 +282,6 @@ export function RecruiterAgent() {
                   >
                     <p>{msg.text}</p>
 
-                    {/* Action link if available */}
                     {msg.actionLink && (
                       <a
                         href={msg.actionLink.href}
@@ -271,7 +296,6 @@ export function RecruiterAgent() {
                     )}
                   </div>
 
-                  {/* Tags */}
                   {msg.tags && (
                     <div className="flex flex-wrap gap-1 mt-1.5">
                       {msg.tags.map((tag) => (
@@ -284,7 +308,6 @@ export function RecruiterAgent() {
                 </div>
               ))}
 
-              {/* Live Loading Indicator */}
               {isLoading && (
                 <div className="flex items-center gap-2 p-3 bg-[var(--color-background)] border border-[var(--color-border)] rounded-md w-fit text-[var(--color-muted)]">
                   <Loader2 className="w-3.5 h-3.5 animate-spin text-[var(--color-accent)]" />
@@ -307,7 +330,7 @@ export function RecruiterAgent() {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about YOLOv11, Kalman math, hiring..."
+                placeholder="Ask about Git, YOLOv11, Kalman math, hiring..."
                 disabled={isLoading}
                 className="flex-1 px-3 py-2 text-xs bg-[var(--color-panel)] border border-[var(--color-border)] rounded-sm text-[var(--color-foreground)] placeholder-[var(--color-muted)] focus:outline-none focus:border-[var(--color-accent)] min-h-[40px] disabled:opacity-60"
               />
