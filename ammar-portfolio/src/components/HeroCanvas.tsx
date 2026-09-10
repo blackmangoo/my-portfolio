@@ -68,16 +68,17 @@ function NeuralNetwork() {
   useFrame((state, delta) => {
     if (!groupRef.current) return;
     const t = state.clock.elapsedTime;
+    // Enhanced responsive mouse tracking
     groupRef.current.rotation.y = THREE.MathUtils.damp(
       groupRef.current.rotation.y,
-      Math.sin(t * 0.3) * 0.25 + state.pointer.x * 0.4,
-      4,
+      Math.sin(t * 0.3) * 0.2 + state.pointer.x * 1.1,
+      5,
       delta
     );
     groupRef.current.rotation.x = THREE.MathUtils.damp(
       groupRef.current.rotation.x,
-      -state.pointer.y * 0.3,
-      4,
+      -state.pointer.y * 0.7,
+      5,
       delta
     );
     groupRef.current.position.y = Math.sin(t * 0.8) * 0.08;
@@ -179,7 +180,7 @@ function LossLandscape() {
 
   const { positions, lines } = useMemo(() => {
     const size = 32;
-    const step = 0.2;
+    const step = 0.22;
     const offset = (size * step) / 2;
     const pts: number[] = [];
     const linePts: number[] = [];
@@ -189,8 +190,8 @@ function LossLandscape() {
         const x = i * step - offset;
         const y = j * step - offset;
         const r = Math.sqrt(x * x + y * y);
-        // Cost surface with local minima
-        const z = Math.sin(r * 2.0) * 0.35 + (r * r) * 0.08 - 0.5;
+        // Cost surface with local minima and saddle points
+        const z = Math.sin(r * 2.2) * 0.42 + (r * r) * 0.09 - 0.55;
 
         pts.push(x, z, y);
 
@@ -198,14 +199,14 @@ function LossLandscape() {
         if (i < size) {
           const xNext = (i + 1) * step - offset;
           const rNext = Math.sqrt(xNext * xNext + y * y);
-          const zNext = Math.sin(rNext * 2.0) * 0.35 + (rNext * rNext) * 0.08 - 0.5;
+          const zNext = Math.sin(rNext * 2.2) * 0.42 + (rNext * rNext) * 0.09 - 0.55;
           linePts.push(x, z, y, xNext, zNext, y);
         }
         // Grid lines along Y
         if (j < size) {
           const yNext = (j + 1) * step - offset;
           const rNext = Math.sqrt(x * x + yNext * yNext);
-          const zNext = Math.sin(rNext * 2.0) * 0.35 + (x * x + yNext * yNext) * 0.08 - 0.5;
+          const zNext = Math.sin(rNext * 2.2) * 0.42 + (x * x + yNext * yNext) * 0.09 - 0.55;
           linePts.push(x, z, y, x, zNext, yNext);
         }
       }
@@ -220,40 +221,53 @@ function LossLandscape() {
   useFrame((state, delta) => {
     if (!groupRef.current) return;
     const t = state.clock.elapsedTime;
+
+    // HIGHLY RESPONSIVE MOUSE TILT & ROTATION
+    // Wide rotational range on pointer X and steep topological tilt on pointer Y
+    const targetRotY = t * 0.12 + state.pointer.x * 1.7;
+    const targetRotX = 0.65 - state.pointer.y * 0.95;
+    const targetRotZ = -state.pointer.x * 0.35; // Aerodynamic Z-banking
+
     groupRef.current.rotation.y = THREE.MathUtils.damp(
       groupRef.current.rotation.y,
-      t * 0.2 + state.pointer.x * 0.5,
-      4,
+      targetRotY,
+      6,
       delta
     );
     groupRef.current.rotation.x = THREE.MathUtils.damp(
       groupRef.current.rotation.x,
-      0.45 - state.pointer.y * 0.3,
-      4,
+      targetRotX,
+      6,
+      delta
+    );
+    groupRef.current.rotation.z = THREE.MathUtils.damp(
+      groupRef.current.rotation.z,
+      targetRotZ,
+      6,
       delta
     );
 
-    // Gradient descent optimization step ball
+    // Dynamic gradient descent optimizer ball rolling down the loss surface
     if (ballRef.current) {
-      const angle = t * 1.5;
+      const angle = t * 1.8;
       const decay = Math.exp(-((t * 0.3) % 4));
       const radius = 1.6 * decay + 0.15;
       const x = Math.cos(angle) * radius;
       const y = Math.sin(angle) * radius;
       const r = Math.sqrt(x * x + y * y);
-      const z = Math.sin(r * 2.0) * 0.35 + (r * r) * 0.08 - 0.5;
-      ballRef.current.position.set(x, z + 0.08, y);
+      const z = Math.sin(r * 2.2) * 0.42 + (r * r) * 0.09 - 0.55;
+      ballRef.current.position.set(x, z + 0.09, y);
     }
   });
 
   return (
-    <group ref={groupRef} position={[0, -0.3, 0]}>
+    <group ref={groupRef} position={[0, -0.2, 0]}>
       {/* Wireframe Surface */}
       <lineSegments>
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" args={[lines, 3]} />
         </bufferGeometry>
-        <lineBasicMaterial color="#2C5545" transparent opacity={0.3} />
+        <lineBasicMaterial color="#2C5545" transparent opacity={0.35} />
       </lineSegments>
 
       {/* Surface Points */}
@@ -261,12 +275,12 @@ function LossLandscape() {
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" args={[positions, 3]} />
         </bufferGeometry>
-        <pointsMaterial size={0.06} color="#2C5545" transparent opacity={0.7} sizeAttenuation />
+        <pointsMaterial size={0.065} color="#2C5545" transparent opacity={0.75} sizeAttenuation />
       </points>
 
       {/* Gradient Descent Optimizer Point */}
       <mesh ref={ballRef}>
-        <sphereGeometry args={[0.08, 16, 16]} />
+        <sphereGeometry args={[0.09, 16, 16]} />
         <meshBasicMaterial color="#10B981" />
       </mesh>
     </group>
@@ -277,86 +291,148 @@ function LossLandscape() {
 
 function PerceptionCloud() {
   const groupRef = useRef<THREE.Group>(null);
+  const scannerRingRef = useRef<THREE.LineLoop>(null);
 
-  const { groundGrid, boundingBox } = useMemo(() => {
+  const { groundGrid, boundingBox, vehicleCabin, headingArrow } = useMemo(() => {
     let seed = 42;
-    // LiDAR ground scanning concentric rings
+    // Concentric ground LiDAR scanning rings
     const groundPts: number[] = [];
-    for (let r = 0.5; r <= 3.5; r += 0.5) {
-      const count = Math.floor(r * 24);
+    for (let r = 0.6; r <= 3.8; r += 0.45) {
+      const count = Math.floor(r * 26);
       for (let i = 0; i < count; i++) {
         const theta = (i / count) * Math.PI * 2;
         groundPts.push(
-          Math.cos(theta) * r + (seededRandom(seed++) - 0.5) * 0.08,
-          -0.8 + (seededRandom(seed++) - 0.5) * 0.03,
-          Math.sin(theta) * r + (seededRandom(seed++) - 0.5) * 0.08
+          Math.cos(theta) * r + (seededRandom(seed++) - 0.5) * 0.09,
+          -0.85 + (seededRandom(seed++) - 0.5) * 0.04,
+          Math.sin(theta) * r + (seededRandom(seed++) - 0.5) * 0.09
         );
       }
     }
 
-    // 3D Object Detection Bounding Box vertices
-    const w = 1.2, h = 0.8, d = 2.0;
+    // 1. Vehicle Lower Chassis 3D Bounding Box
+    const w = 1.3, h = 0.55, d = 2.4;
     const x0 = -w / 2, x1 = w / 2;
-    const y0 = -0.7, y1 = y0 + h;
+    const y0 = -0.75, y1 = y0 + h;
     const z0 = -d / 2, z1 = d / 2;
 
     const boxLines = [
-      // Bottom face
       x0, y0, z0, x1, y0, z0,
       x1, y0, z0, x1, y0, z1,
       x1, y0, z1, x0, y0, z1,
       x0, y0, z1, x0, y0, z0,
-      // Top face
       x0, y1, z0, x1, y1, z0,
       x1, y1, z0, x1, y1, z1,
       x1, y1, z1, x0, y1, z1,
       x0, y1, z1, x0, y1, z0,
-      // Pillars
       x0, y0, z0, x0, y1, z0,
       x1, y0, z0, x1, y1, z0,
       x1, y0, z1, x1, y1, z1,
       x0, y0, z1, x0, y1, z1,
     ];
 
+    // 2. Vehicle Cabin Top Bounding Box
+    const cw = 1.0, ch = 0.45, cd = 1.3;
+    const cx0 = -cw / 2, cx1 = cw / 2;
+    const cy0 = y1, cy1 = cy0 + ch;
+    const cz0 = -cd / 2 + 0.1, cz1 = cd / 2 + 0.1;
+
+    const cabinLines = [
+      cx0, cy0, cz0, cx1, cy0, cz0,
+      cx1, cy0, cz0, cx1, cy0, cz1,
+      cx1, cy0, cz1, cx0, cy0, cz1,
+      cx0, cy0, cz1, cx0, cy0, cz0,
+      cx0, cy1, cz0, cx1, cy1, cz0,
+      cx1, cy1, cz0, cx1, cy1, cz1,
+      cx1, cy1, cz1, cx0, cy1, cz1,
+      cx0, cy1, cz1, cx0, cy1, cz0,
+      cx0, cy0, cz0, cx0, cy1, cz0,
+      cx1, cy0, cz0, cx1, cy1, cz0,
+      cx1, cy0, cz1, cx1, cy1, cz1,
+      cx0, cy0, cz1, cx0, cy1, cz1,
+    ];
+
+    // 3. Autonomous Velocity Heading Arrow
+    const arrowLines = [
+      0, y1, z1, 0, y1, z1 + 0.6,
+      0, y1, z1 + 0.6, -0.15, y1, z1 + 0.45,
+      0, y1, z1 + 0.6, 0.15, y1, z1 + 0.45,
+    ];
+
     return {
       groundGrid: new Float32Array(groundPts),
       boundingBox: new Float32Array(boxLines),
+      vehicleCabin: new Float32Array(cabinLines),
+      headingArrow: new Float32Array(arrowLines),
     };
   }, []);
 
   useFrame((state, delta) => {
     if (!groupRef.current) return;
     const t = state.clock.elapsedTime;
+
+    // HIGHLY RESPONSIVE AUTONOMOUS CAR TRACKING
+    // Direct pointer tracking with strong rotational response
+    const targetRotY = t * 0.12 + state.pointer.x * 2.0;
+    const targetRotX = 0.52 - state.pointer.y * 0.95;
+    const targetRotZ = -state.pointer.x * 0.3; // Responsive banking
+
     groupRef.current.rotation.y = THREE.MathUtils.damp(
       groupRef.current.rotation.y,
-      t * 0.25 + state.pointer.x * 0.4,
-      4,
+      targetRotY,
+      6,
       delta
     );
     groupRef.current.rotation.x = THREE.MathUtils.damp(
       groupRef.current.rotation.x,
-      0.35 - state.pointer.y * 0.2,
-      4,
+      targetRotX,
+      6,
       delta
     );
+    groupRef.current.rotation.z = THREE.MathUtils.damp(
+      groupRef.current.rotation.z,
+      targetRotZ,
+      6,
+      delta
+    );
+
+    // Rotating LiDAR active laser sweep beam
+    if (scannerRingRef.current) {
+      scannerRingRef.current.rotation.y += delta * 3.5;
+    }
   });
 
   return (
-    <group ref={groupRef} position={[0, 0, 0]}>
+    <group ref={groupRef} position={[0, -0.1, 0]}>
       {/* Concentric Ground LiDAR scanning points */}
       <points>
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" args={[groundGrid, 3]} />
         </bufferGeometry>
-        <pointsMaterial size={0.06} color="#2C5545" transparent opacity={0.65} sizeAttenuation />
+        <pointsMaterial size={0.065} color="#2C5545" transparent opacity={0.65} sizeAttenuation />
       </points>
 
-      {/* 3D YOLOv11 Vehicle Bounding Box */}
+      {/* 3D YOLOv11 Vehicle Chassis Bounding Box */}
       <lineSegments>
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" args={[boundingBox, 3]} />
         </bufferGeometry>
         <lineBasicMaterial color="#10B981" />
+      </lineSegments>
+
+      {/* Vehicle Cabin Upper Bounding Box */}
+      <lineSegments>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" args={[vehicleCabin, 3]} />
+        </bufferGeometry>
+        <lineBasicMaterial color="#10B981" transparent opacity={0.85} />
+      </lineSegments>
+
+      {/* Forward Velocity Vector Arrow */}
+      <lineSegments>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" args={[headingArrow, 3]} />
+        </bufferGeometry>
+        <lineBasicMaterial color="#34D399" linewidth={2} />
       </lineSegments>
     </group>
   );
