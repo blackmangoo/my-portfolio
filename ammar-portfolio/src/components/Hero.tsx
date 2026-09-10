@@ -1,263 +1,98 @@
 "use client";
 
-import { useRef, useMemo, useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { siteConfig } from "@/data/site";
-import { Suspense } from "react";
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import { Text } from "@react-three/drei";
-import * as THREE from "three";
-import { motion, AnimatePresence } from "framer-motion";
-import { OBJLoader } from "three/addons/loaders/OBJLoader.js";
+import { ArrowDown, FileText, Github } from "lucide-react";
 
-function NeuralNetwork() {
-  const groupRef = useRef<THREE.Group>(null);
-  
-  // Input Layer (4), Hidden 1 (6), Hidden 2 (6), Output Layer (2)
-  const layers = [4, 6, 6, 2];
-  const layerSpacing = 2.5;
-  const nodeSpacing = 1.0;
-  
-  const nodes = useMemo(() => {
-    const pts = [];
-    let startX = -(layers.length - 1) * layerSpacing / 2;
-    
-    for (let i = 0; i < layers.length; i++) {
-      const numNodes = layers[i];
-      const startY = -(numNodes - 1) * nodeSpacing / 2;
-      const layerPts = [];
-      for (let j = 0; j < numNodes; j++) {
-        layerPts.push(new THREE.Vector3(
-          startX + (Math.random() - 0.5) * 0.4,
-          startY + j * nodeSpacing + (Math.random() - 0.5) * 0.4,
-          (Math.random() - 0.5) * 1.5 - 1.5 // Placed behind the face
-        ));
-      }
-      pts.push(layerPts);
-      startX += layerSpacing;
-    }
-    return pts;
-  }, []);
-
-  const lines = useMemo(() => {
-    const positions = [];
-    for (let i = 0; i < nodes.length - 1; i++) {
-      for (const nodeA of nodes[i]) {
-        for (const nodeB of nodes[i+1]) {
-          // 60% connection probability for a more organic, slightly sparse web
-          if (Math.random() > 0.4) {
-            positions.push(nodeA.x, nodeA.y, nodeA.z);
-            positions.push(nodeB.x, nodeB.y, nodeB.z);
-          }
-        }
-      }
-    }
-    return new Float32Array(positions);
-  }, [nodes]);
-
-  const flatNodes = useMemo(() => {
-    const positions = [];
-    for (const layer of nodes) {
-      for (const node of layer) {
-        positions.push(node.x, node.y, node.z);
-      }
-    }
-    return new Float32Array(positions);
-  }, [nodes]);
-
-  useFrame((state) => {
-    if (groupRef.current) {
-      // Slow organic rotation
-      groupRef.current.rotation.y = Math.sin(state.clock.elapsedTime * 0.15) * 0.15;
-      groupRef.current.position.y = Math.sin(state.clock.elapsedTime * 0.3) * 0.2;
-      
-      // Parallax interaction
-      groupRef.current.position.x += (state.pointer.x * 1.0 - groupRef.current.position.x) * 0.05;
-      groupRef.current.position.y += (state.pointer.y * 1.0 - groupRef.current.position.y) * 0.05;
-    }
-  });
-
-  return (
-    <group ref={groupRef} position={[0, 0, -2]}>
-      <lineSegments>
-        <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[lines, 3]} />
-        </bufferGeometry>
-        <lineBasicMaterial color="#2C5545" transparent opacity={0.15} />
-      </lineSegments>
-      <points>
-        <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[flatNodes, 3]} />
-        </bufferGeometry>
-        <pointsMaterial size={0.15} color="#2C5545" transparent opacity={0.6} sizeAttenuation={true} />
-      </points>
-    </group>
-  );
-}
-
-function FacePointCloud() {
-  const ref = useRef<THREE.Points>(null);
-  const targetScale = useRef(0.065);
-  
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "+" || e.key === "=") {
-        targetScale.current = Math.min(targetScale.current + 0.02, 0.35);
-      } else if (e.key === "-" || e.key === "_") {
-        targetScale.current = Math.max(targetScale.current - 0.02, 0.001);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
-  
-  // Load the face model
-  const obj = useLoader(OBJLoader, '/face.obj');
-  
-  const positions = useMemo(() => {
-    let pos: Float32Array | null = null;
-    obj.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
-        // Just take the first mesh's positions
-        if (!pos) pos = child.geometry.attributes.position.array;
-      }
-    });
-    return pos || new Float32Array(0);
-  }, [obj]);
-
-  useFrame((state, delta) => {
-    if (ref.current) {
-      // Highly sensitive tracking
-      const targetX = (state.pointer.x * Math.PI) / 0.8;
-      
-      // Shift targetY slightly down (adding an offset) so the mouse points at the nose/eyes instead of lips
-      const targetY = (state.pointer.y * Math.PI) / 0.8 - 0.2;
-      
-      // Fast, smooth interpolation
-      ref.current.rotation.y += (targetX - ref.current.rotation.y) * 0.15;
-      ref.current.rotation.x += (-targetY - ref.current.rotation.x) * 0.15;
-
-      // Add a subtle continuous floating animation
-      ref.current.position.y = -1.25 + Math.sin(state.clock.elapsedTime) * 0.1;
-
-      // Smooth scale interpolation
-      const currentScale = ref.current.scale.x;
-      const newScale = currentScale + (targetScale.current - currentScale) * 0.1;
-      ref.current.scale.set(newScale, newScale, newScale);
-    }
-  });
-
-  if (positions.length === 0) return null;
-
-  return (
-    <points ref={ref} scale={0.065} position={[0, -1.25, 0]}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          args={[positions, 3]}
-        />
-      </bufferGeometry>
-      <pointsMaterial
-        size={0.035}
-        color="#2C5545"
-        sizeAttenuation={true}
-        transparent={true}
-        opacity={0.9}
-      />
-    </points>
-  );
-}
+// Dynamically import the WebGL 3D Canvas with ssr: false to guarantee fast FCP
+const HeroCanvas = dynamic(
+  () => import("./HeroCanvas").then((mod) => mod.HeroCanvas),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-[380px] sm:h-[480px] lg:h-[620px] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3 text-[var(--color-muted)]">
+          <div className="w-12 h-12 rounded-full border-2 border-[var(--color-border)] border-t-[var(--color-accent)] animate-spin" />
+          <span className="text-xs font-mono tracking-wider uppercase">Loading 3D Visualizer...</span>
+        </div>
+      </div>
+    ),
+  }
+);
 
 export function Hero() {
-  const [showHint, setShowHint] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShowHint(false), 8000);
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "+" || e.key === "=" || e.key === "-" || e.key === "_") {
-        setShowHint(false);
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
-
   return (
-    <section id="home" className="relative pt-24 pb-20 px-6 z-10 overflow-hidden">
-      <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-        {/* LEFT: Editorial Text */}
-        <div className="flex flex-col z-10">
-          <div className="mb-8">
-            <span className="inline-block px-3 py-1 text-xs font-medium text-[#2C5545] bg-[#2C5545]/10 border border-[#2C5545]/20 rounded-full">
+    <section id="home" className="relative pt-28 pb-20 px-6 z-10 overflow-hidden bg-[var(--color-background)] transition-colors">
+      <div className="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+
+        {/* LEFT COLUMN: Editorial Narrative (7 Cols) */}
+        <div className="lg:col-span-6 flex flex-col z-10">
+
+          {/* Availability Status Chip */}
+          <div className="mb-6 flex items-center gap-3">
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-[var(--color-accent)] bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 rounded-full">
+              <span className="w-2 h-2 rounded-full bg-[var(--color-accent)] animate-pulse" />
               {siteConfig.hero.cta}
             </span>
           </div>
-          
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight text-[#1A1A1A] leading-[1.15] mb-6">
-            {siteConfig.hero.headline}
+
+          {/* Master Headline */}
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight text-[var(--color-foreground)] leading-[1.12] mb-6">
+            Engineering <span className="text-[var(--color-accent)] font-semibold">applied AI</span> from model weights to production systems.
           </h1>
-          
-          <p className="text-lg text-[#6B7280] leading-relaxed max-w-xl mb-10">
-            {siteConfig.hero.subheadline}
+
+          {/* Subheadline with clear value proposition */}
+          <p className="text-base sm:text-lg text-[var(--color-muted)] leading-relaxed max-w-xl mb-8">
+            BS Artificial Intelligence graduate from FAST-NUCES. Specializing in computer vision pipelines (YOLOv11), sensor fusion (Kalman filters), autonomous agents, and low-latency FastAPI architectures.
           </p>
-          
-          <div className="flex flex-wrap items-center gap-4">
+
+          {/* Tech stack badges */}
+          <div className="flex flex-wrap gap-2 mb-10">
+            {siteConfig.hero.badges.map((badge) => (
+              <span
+                key={badge}
+                className="px-2.5 py-1 text-xs font-mono font-medium text-[var(--color-foreground)] bg-[var(--color-panel)] border border-[var(--color-border)] rounded-sm"
+              >
+                {badge}
+              </span>
+            ))}
+          </div>
+
+          {/* Action CTAs with accessible touch targets */}
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4">
             <a
               href="#projects"
-              className="px-6 py-3 bg-[#1A1A1A] text-white text-sm font-medium hover:bg-[#2C5545] transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#2C5545]"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[var(--color-foreground)] text-[var(--color-background)] text-sm font-medium hover:bg-[var(--color-accent)] transition-colors rounded-sm min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-accent)]"
             >
-              View my work
+              <span>Explore Projects</span>
+              <ArrowDown className="w-4 h-4" />
             </a>
+
             <a
               href={siteConfig.cvPath}
-              className="px-6 py-3 bg-white text-[#1A1A1A] border border-[#E5E7EB] text-sm font-medium hover:bg-slate-50 transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#2C5545]"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[var(--color-panel)] text-[var(--color-foreground)] border border-[var(--color-border)] text-sm font-medium hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors rounded-sm min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-accent)]"
             >
-              Download CV
+              <FileText className="w-4 h-4" />
+              <span>Download CV</span>
             </a>
+
             <a
               href={siteConfig.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-3 text-sm font-medium text-[#6B7280] hover:text-[#1A1A1A] transition-colors focus-visible:outline-none underline underline-offset-4 decoration-transparent hover:decoration-[#1A1A1A]"
+              className="inline-flex items-center justify-center gap-2 px-4 py-3.5 text-sm font-medium text-[var(--color-muted)] hover:text-[var(--color-foreground)] transition-colors min-h-[44px] underline underline-offset-4 decoration-[var(--color-border)] hover:decoration-[var(--color-foreground)]"
             >
-              GitHub
+              <Github className="w-4 h-4" />
+              <span>GitHub</span>
             </a>
           </div>
         </div>
 
-        {/* RIGHT: Restrained 3D Visual */}
-        <div className="relative h-[400px] lg:h-[600px] w-full flex items-center justify-center -mr-12 opacity-80 pointer-events-none lg:pointer-events-auto">
-          <Canvas camera={{ position: [0, 0, 5], fov: 60 }}>
-            <Suspense fallback={null}>
-              <NeuralNetwork />
-              <FacePointCloud />
-            </Suspense>
-          </Canvas>
-          {/* Subtle overlay to soften it */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#FAF9F6] via-transparent to-transparent pointer-events-none" />
-          
-          {/* Elegant interaction hint HTML Overlay */}
-          <AnimatePresence>
-            {showHint && (
-              <motion.div
-                initial={{ opacity: 0, y: 10, x: "-50%" }}
-                animate={{ opacity: 1, y: 0, x: "-50%" }}
-                exit={{ opacity: 0, scale: 0.95, x: "-50%" }}
-                transition={{ delay: 1, duration: 0.8, ease: [0.25, 1, 0.5, 1] }}
-                className="absolute bottom-24 left-1/2 z-20 pointer-events-none"
-              >
-                <div className="bg-[#1A1A1A]/90 backdrop-blur-md text-white text-xs font-medium px-4 py-2.5 rounded-full shadow-lg flex items-center gap-3">
-                  <span className="flex gap-1.5">
-                    <kbd className="bg-white/20 px-2 py-0.5 rounded text-[11px] font-sans">+</kbd>
-                    <kbd className="bg-white/20 px-2 py-0.5 rounded text-[11px] font-sans">-</kbd>
-                  </span>
-                  Zoom 3D Model
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+        {/* RIGHT COLUMN: Interactive 3D WebGL Visualization (6 Cols) */}
+        <div className="lg:col-span-6 relative w-full">
+          <HeroCanvas />
         </div>
       </div>
     </section>

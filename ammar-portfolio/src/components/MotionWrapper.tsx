@@ -60,7 +60,7 @@ export function MotionWrapper({
     <motion.div
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: margin as any }}
+      viewport={{ once: true, margin }}
       variants={variants}
       className={className}
     >

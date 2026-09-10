@@ -1,22 +1,23 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, useSpring, useMotionValue } from "framer-motion";
+import { motion, useSpring, useMotionValue, useReducedMotion } from "framer-motion";
 
 export function CustomCursor() {
   const [isVisible, setIsVisible] = useState(false);
   const [isPointer, setIsPointer] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
 
-  // Use motion values for better performance than React state
   const mouseX = useMotionValue(-100);
   const mouseY = useMotionValue(-100);
 
-  // Smooth springs for the outer ring trailing effect
-  const springConfig = { damping: 25, stiffness: 400, mass: 0.5 };
+  const springConfig = { damping: 28, stiffness: 350, mass: 0.5 };
   const cursorXSpring = useSpring(mouseX, springConfig);
   const cursorYSpring = useSpring(mouseY, springConfig);
 
   useEffect(() => {
+    if (shouldReduceMotion) return;
+
     const handleMouseMove = (e: MouseEvent) => {
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
@@ -27,40 +28,42 @@ export function CustomCursor() {
     const handleMouseEnter = () => setIsVisible(true);
 
     const handleMouseOver = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      // Check if we are hovering over an interactive element
-      if (
-        target.tagName.toLowerCase() === "a" ||
-        target.tagName.toLowerCase() === "button" ||
-        target.closest("a") ||
-        target.closest("button")
-      ) {
-        setIsPointer(true);
-      } else {
-        setIsPointer(false);
-      }
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      const isInteractive =
+        target.tagName === "A" ||
+        target.tagName === "BUTTON" ||
+        target.getAttribute("role") === "button" ||
+        target.closest("a") !== null ||
+        target.closest("button") !== null ||
+        target.closest("[role='button']") !== null ||
+        target.classList.contains("interactive-hover");
+      setIsPointer(isInteractive);
     };
 
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseout", handleMouseLeave);
-    window.addEventListener("mouseover", handleMouseEnter);
-    window.addEventListener("mouseover", handleMouseOver);
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    document.addEventListener("mouseleave", handleMouseLeave);
+    document.addEventListener("mouseenter", handleMouseEnter);
+    window.addEventListener("mouseover", handleMouseOver, { passive: true });
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseout", handleMouseLeave);
-      window.removeEventListener("mouseover", handleMouseEnter);
+      document.removeEventListener("mouseleave", handleMouseLeave);
+      document.removeEventListener("mouseenter", handleMouseEnter);
       window.removeEventListener("mouseover", handleMouseOver);
     };
-  }, [mouseX, mouseY, isVisible]);
+  }, [mouseX, mouseY, isVisible, shouldReduceMotion]);
 
-  if (typeof window === "undefined") return null;
+  if (shouldReduceMotion) return null;
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-[9999] hidden sm:block">
-      {/* Outer trailing ring */}
+    <div
+      className="pointer-events-none fixed inset-0 z-[9999] hidden lg:block overflow-hidden"
+      aria-hidden="true"
+    >
+      {/* Soft trailing accent ring */}
       <motion.div
-        className="fixed left-0 top-0 rounded-full border border-[#2C5545]/40"
+        className="fixed left-0 top-0 rounded-full border border-[var(--color-accent)]/30 transition-colors"
         style={{
           x: cursorXSpring,
           y: cursorYSpring,
@@ -68,29 +71,13 @@ export function CustomCursor() {
           translateY: "-50%",
         }}
         animate={{
-          width: isPointer ? 48 : 32,
-          height: isPointer ? 48 : 32,
+          width: isPointer ? 44 : 26,
+          height: isPointer ? 44 : 26,
           opacity: isVisible ? 1 : 0,
-          backgroundColor: isPointer ? "rgba(44, 85, 69, 0.05)" : "transparent",
+          backgroundColor: isPointer ? "var(--highlight)" : "transparent",
+          borderColor: isPointer ? "var(--color-accent)" : "rgba(44, 85, 69, 0.25)",
         }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
-      />
-      {/* Inner precise dot */}
-      <motion.div
-        className="fixed left-0 top-0 rounded-full bg-[#1A1A1A]"
-        style={{
-          x: mouseX,
-          y: mouseY,
-          translateX: "-50%",
-          translateY: "-50%",
-          width: 6,
-          height: 6,
-        }}
-        animate={{
-          opacity: isVisible ? 1 : 0,
-          scale: isPointer ? 0 : 1,
-        }}
-        transition={{ duration: 0.15 }}
+        transition={{ type: "spring", stiffness: 350, damping: 25 }}
       />
     </div>
   );

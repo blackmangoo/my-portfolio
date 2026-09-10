@@ -4,9 +4,24 @@
   --background: #FAF9F6;
   --foreground: #1A1A1A;
   --accent: #2C5545;
+  --accent-light: #3D735F;
   --muted: #6B7280;
   --border: #E5E7EB;
   --panel: #FFFFFF;
+  --card-bg: #FFFFFF;
+  --highlight: rgba(44, 85, 69, 0.08);
+}
+
+[data-theme="dark"] {
+  --background: #0E1110;
+  --foreground: #F3F4F6;
+  --accent: #10B981;
+  --accent-light: #34D399;
+  --muted: #9CA3AF;
+  --border: #232D27;
+  --panel: #161B18;
+  --card-bg: #161B18;
+  --highlight: rgba(16, 185, 129, 0.12);
 }
 
 @theme inline {
@@ -18,15 +33,6 @@
   --color-panel: var(--panel);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  body {
-    cursor: none;
-  }
-  a, button, [role="button"] {
-    cursor: none;
-  }
 }
 
 /* ===== Base ===== */

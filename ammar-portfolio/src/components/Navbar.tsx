@@ -2,16 +2,34 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sun, Moon } from "lucide-react";
 import { siteConfig } from "@/data/site";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState("home");
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  // Sync with user's system preference or stored theme
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("portfolio-theme") as "light" | "dark" | null;
+    const initialTheme = savedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.dataset.theme = initialTheme;
+    requestAnimationFrame(() => {
+      setTheme(initialTheme);
+    });
+  }, []);
+
+  const toggleTheme = () => {
+    const nextTheme = theme === "light" ? "dark" : "light";
+    setTheme(nextTheme);
+    document.documentElement.dataset.theme = nextTheme;
+    localStorage.setItem("portfolio-theme", nextTheme);
+  };
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    const handleScroll = () => setIsScrolled(window.scrollY > 40);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -73,21 +91,28 @@ export function Navbar() {
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled
-          ? "bg-[#FAF9F6]/90 backdrop-blur-md border-b border-[#E5E7EB] shadow-[0_4px_20px_rgba(0,0,0,0.02)]"
+          ? "bg-[var(--color-background)]/90 backdrop-blur-md border-b border-[var(--color-border)] shadow-sm"
           : "bg-transparent"
       }`}
     >
-      <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between" aria-label="Main navigation">
-        {/* Logo */}
-        <button
-          onClick={() => handleNavClick("#home")}
-          className="text-base font-medium text-[#1A1A1A] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#2C5545] rounded-sm"
-          aria-label="Go to home"
-        >
-          Ammar Akbar
-        </button>
+      <nav className="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between" aria-label="Main navigation">
+        {/* Identity & Status */}
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => handleNavClick("#home")}
+            className="text-base font-semibold tracking-tight text-[var(--color-foreground)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] rounded-sm min-h-[44px] flex items-center"
+            aria-label="Go to home"
+          >
+            {siteConfig.shortName}
+          </button>
 
-        {/* Desktop nav links */}
+          <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono text-[var(--color-accent)] bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 rounded-full">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] animate-pulse" />
+            <span>Open to AI Roles</span>
+          </span>
+        </div>
+
+        {/* Desktop Nav Links & Controls */}
         <div className="hidden md:flex items-center gap-6">
           {siteConfig.navItems.map((item) => {
             const sectionId = item.href.replace("#", "");
@@ -96,8 +121,8 @@ export function Navbar() {
               <button
                 key={item.href}
                 onClick={() => handleNavClick(item.href)}
-                className={`relative text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#2C5545] rounded-sm ${
-                  isActive ? "text-[#1A1A1A]" : "text-[#6B7280] hover:text-[#1A1A1A]"
+                className={`relative text-sm font-medium transition-colors min-h-[44px] px-2 flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] rounded-sm ${
+                  isActive ? "text-[var(--color-foreground)] font-semibold" : "text-[var(--color-muted)] hover:text-[var(--color-foreground)]"
                 }`}
                 aria-current={isActive ? "true" : undefined}
               >
@@ -105,36 +130,57 @@ export function Navbar() {
                 {isActive && (
                   <motion.span
                     layoutId="navbar-underline"
-                    className="absolute left-0 right-0 -bottom-[6px] h-[1.5px] bg-[#2C5545]"
+                    className="absolute left-0 right-0 -bottom-[1px] h-[2px] bg-[var(--color-accent)]"
                     transition={{ type: "spring", stiffness: 380, damping: 30 }}
                   />
                 )}
               </button>
             );
           })}
-          
+
+          {/* Theme Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            className="p-2.5 text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors rounded-sm min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
+            aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+            title={`Toggle ${theme === "light" ? "Dark" : "Light"} Mode`}
+          >
+            {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4 text-amber-400" />}
+          </button>
+
+          {/* Resume CTA */}
           <a
             href={siteConfig.cvPath}
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-4 px-4 py-2 text-sm font-medium text-white bg-[#1A1A1A] hover:bg-[#2C5545] transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#2C5545]"
+            className="ml-2 px-4 py-2.5 text-xs font-medium text-[var(--color-background)] bg-[var(--color-foreground)] hover:bg-[var(--color-accent)] transition-colors rounded-sm min-h-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-accent)]"
           >
-            Resume
+            Resume (PDF)
           </a>
         </div>
 
-        {/* Mobile toggle */}
-        <button
-          onClick={() => setIsMobileOpen(!isMobileOpen)}
-          className="md:hidden p-2 text-[#1A1A1A] hover:bg-black/5 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#2C5545] rounded-sm"
-          aria-label={isMobileOpen ? "Close menu" : "Open menu"}
-          aria-expanded={isMobileOpen}
-        >
-          {isMobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
+        {/* Mobile menu toggle & theme */}
+        <div className="flex items-center gap-2 md:hidden">
+          <button
+            onClick={toggleTheme}
+            className="p-2 text-[var(--color-muted)] hover:text-[var(--color-foreground)] min-h-[44px] min-w-[44px] flex items-center justify-center rounded-sm"
+            aria-label="Toggle theme"
+          >
+            {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4 text-amber-400" />}
+          </button>
+
+          <button
+            onClick={() => setIsMobileOpen(!isMobileOpen)}
+            className="p-2 text-[var(--color-foreground)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
+            aria-label={isMobileOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={isMobileOpen}
+          >
+            {isMobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </nav>
 
-      {/* Mobile drawer */}
+      {/* Mobile Drawer */}
       <AnimatePresence>
         {isMobileOpen && (
           <>
@@ -143,7 +189,7 @@ export function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="md:hidden fixed inset-0 top-[60px] bg-black/10 backdrop-blur-sm z-40"
+              className="md:hidden fixed inset-0 top-[60px] bg-black/40 backdrop-blur-sm z-40"
               onClick={() => setIsMobileOpen(false)}
               aria-hidden="true"
             />
@@ -152,9 +198,9 @@ export function Navbar() {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2 }}
-              className="md:hidden relative z-50 bg-[#FAF9F6] border-b border-[#E5E7EB] overflow-hidden"
+              className="md:hidden relative z-50 bg-[var(--color-background)] border-b border-[var(--color-border)] overflow-hidden"
             >
-              <div className="px-6 py-4 flex flex-col gap-1">
+              <div className="px-6 py-4 flex flex-col gap-2">
                 {siteConfig.navItems.map((item) => {
                   const sectionId = item.href.replace("#", "");
                   const isActive = activeSection === sectionId;
@@ -162,10 +208,10 @@ export function Navbar() {
                     <button
                       key={item.href}
                       onClick={() => handleNavClick(item.href)}
-                      className={`px-4 py-3 text-left text-sm font-medium rounded-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#2C5545] ${
+                      className={`px-4 py-3 text-left text-sm font-medium rounded-sm min-h-[44px] flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] ${
                         isActive
-                          ? "text-[#1A1A1A] bg-[#2C5545]/5"
-                          : "text-[#6B7280] hover:text-[#1A1A1A] hover:bg-black/5"
+                          ? "text-[var(--color-foreground)] font-semibold bg-[var(--color-accent)]/10"
+                          : "text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-black/5 dark:hover:bg-white/5"
                       }`}
                     >
                       {item.label}
@@ -176,9 +222,9 @@ export function Navbar() {
                   href={siteConfig.cvPath}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-2 mx-4 px-4 py-3 text-center text-sm font-medium text-white bg-[#1A1A1A] hover:bg-[#2C5545] transition-colors rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#2C5545]"
+                  className="mt-2 px-4 py-3.5 text-center text-sm font-medium text-[var(--color-background)] bg-[var(--color-foreground)] hover:bg-[var(--color-accent)] transition-colors rounded-sm min-h-[44px] flex items-center justify-center"
                 >
-                  Resume
+                  Download Resume
                 </a>
               </div>
             </motion.div>
