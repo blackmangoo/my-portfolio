@@ -4,8 +4,6 @@ import { omniDrive, featuredProjects, minorProjects } from "@/data/projects";
 import { experiences } from "@/data/experience";
 import { skillGroups } from "@/data/skills";
 
-const FALLBACK_KEY = "AQ.Ab8RN6JCmcGGmxB_o3pTeT6rwrj6jcOLeJF5YiEZ1AuTyXPFLA";
-
 const SYSTEM_PROMPT = `
 You are "Ammar's AI Twin" — the personal AI executive assistant representing Mian Muhammad Ammar (Ammar Akbar).
 Your primary job is to answer questions from recruiters, engineering managers, and visitors about Ammar's engineering skills, projects, background, and availability for hire.
@@ -69,7 +67,13 @@ ${skillGroups.map((g) => `${g.category}: ${g.skills.join(", ")}`).join("\n")}
 
 export async function POST(req: NextRequest) {
   try {
-    const apiKey = process.env.GEMINI_API_KEY || FALLBACK_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: "GEMINI_API_KEY is not configured on the server." },
+        { status: 500 }
+      );
+    }
 
     const { messages } = await req.json();
     if (!Array.isArray(messages) || messages.length === 0) {
