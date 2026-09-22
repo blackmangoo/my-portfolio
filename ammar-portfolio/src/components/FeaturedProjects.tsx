@@ -15,6 +15,7 @@ import {
 import { MotionWrapper } from "./MotionWrapper";
 import { Github, Layers } from "lucide-react";
 import { OmniDriveExplorer } from "./OmniDriveExplorer";
+import { motion, AnimatePresence } from "framer-motion";
 
 const categories: ProjectCategory[] = [
   "All",
@@ -53,16 +54,19 @@ function CaseStudy({ project, isFlagship = false }: { project: ProjectItem; isFl
 
           <div className="flex flex-wrap gap-2 mb-8">
             {project.stack.map((tech: string) => (
-              <span
+              <motion.span
                 key={tech}
-                className="text-xs font-mono px-2.5 py-1 bg-[var(--color-background)] border border-[var(--color-border)] text-[var(--color-foreground)] rounded-sm"
+                whileHover={{ scale: 1.05 }}
+                className="text-xs font-mono px-2.5 py-1 bg-[var(--color-background)] border border-[var(--color-border)] text-[var(--color-foreground)] rounded-sm cursor-default"
               >
                 {tech}
-              </span>
+              </motion.span>
             ))}
           </div>
 
-          <a
+          <motion.a
+            whileHover={{ scale: 1.02, x: 2 }}
+            whileTap={{ scale: 0.98 }}
             href={project.github}
             target="_blank"
             rel="noopener noreferrer"
@@ -70,11 +74,11 @@ function CaseStudy({ project, isFlagship = false }: { project: ProjectItem; isFl
           >
             <span>View Architecture & Code</span>
             <Github className="w-4 h-4" />
-          </a>
+          </motion.a>
         </div>
 
         {/* RIGHT: Architecture / Metrics Cards */}
-        <div className="w-full lg:w-7/12 border border-[var(--color-border)] p-6 sm:p-8 bg-[var(--color-panel)] rounded-sm shadow-sm">
+        <div className="w-full lg:w-7/12 border border-[var(--color-border)] p-6 sm:p-8 bg-[var(--color-panel)] rounded-sm shadow-sm transition-colors">
           {project.metrics && (
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8 pb-6 border-b border-[var(--color-border)]">
               {project.metrics.map((metric: OmniDriveMetric | { value: string; label: string }) => (
@@ -185,38 +189,67 @@ export function FeaturedProjects() {
               </p>
             </div>
 
-            {/* Discipline Category Filter */}
+            {/* Discipline Category Filter with Framer Motion Layout Pill */}
             <div className="flex flex-wrap gap-1.5 p-1 bg-[var(--color-panel)] border border-[var(--color-border)] rounded-sm">
-              {categories.map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-3 py-1.5 text-xs font-medium rounded-sm transition-colors min-h-[36px] ${
-                    selectedCategory === cat
-                      ? "bg-[var(--color-foreground)] text-[var(--color-background)] font-semibold shadow-sm"
-                      : "text-[var(--color-muted)] hover:text-[var(--color-foreground)]"
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
+              {categories.map((cat) => {
+                const isSelected = selectedCategory === cat;
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(cat)}
+                    className={`relative px-3 py-1.5 text-xs font-medium rounded-sm transition-colors min-h-[36px] z-10 ${
+                      isSelected
+                        ? "text-[var(--color-background)] font-semibold"
+                        : "text-[var(--color-muted)] hover:text-[var(--color-foreground)]"
+                    }`}
+                  >
+                    {isSelected && (
+                      <motion.span
+                        layoutId="activeCategoryPill"
+                        className="absolute inset-0 bg-[var(--color-foreground)] rounded-sm -z-10 shadow-sm"
+                        transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                      />
+                    )}
+                    {cat}
+                  </button>
+                );
+              })}
             </div>
           </div>
         </MotionWrapper>
 
-        {/* Flagship: OmniDrive AI */}
-        {showFlagship && (
-          <MotionWrapper>
-            <CaseStudy project={omniDrive} isFlagship={true} />
-          </MotionWrapper>
-        )}
+        {/* Dynamic Project List with Framer Motion AnimatePresence & Layout Springs */}
+        <motion.div layout className="space-y-4">
+          <AnimatePresence mode="popLayout">
+            {/* Flagship: OmniDrive AI */}
+            {showFlagship && (
+              <motion.div
+                key="flagship-omnidrive"
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <CaseStudy project={omniDrive} isFlagship={true} />
+              </motion.div>
+            )}
 
-        {/* Filtered Featured Projects */}
-        <MotionWrapper>
-          {filteredProjects.map((project) => (
-            <CaseStudy key={project.title} project={project} />
-          ))}
-        </MotionWrapper>
+            {/* Filtered Featured Projects */}
+            {filteredProjects.map((project) => (
+              <motion.div
+                key={project.title}
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <CaseStudy project={project} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
 
         {/* Minor Projects & Research Prototypes */}
         <MotionWrapper>
@@ -227,8 +260,10 @@ export function FeaturedProjects() {
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {minorProjects.map((project) => (
-                <div
+                <motion.div
                   key={project.title}
+                  whileHover={{ y: -4, borderColor: "var(--color-accent)" }}
+                  transition={{ type: "spring", stiffness: 350, damping: 22 }}
                   className="p-5 border border-[var(--color-border)] bg-[var(--color-panel)] rounded-sm hover:border-[var(--color-accent)] transition-colors flex flex-col justify-between"
                 >
                   <div>
@@ -239,7 +274,8 @@ export function FeaturedProjects() {
                     <p className="text-xs text-[var(--color-muted)] leading-relaxed mb-4">{project.tagline}</p>
                   </div>
                   {project.github && (
-                    <a
+                    <motion.a
+                      whileHover={{ x: 2 }}
                       href={project.github}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -247,9 +283,9 @@ export function FeaturedProjects() {
                     >
                       <span>Repository</span>
                       <Github className="w-3 h-3" />
-                    </a>
+                    </motion.a>
                   )}
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>

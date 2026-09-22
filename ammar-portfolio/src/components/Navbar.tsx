@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { Menu, X, Sun, Moon } from "lucide-react";
 import { siteConfig } from "@/data/site";
 
@@ -10,6 +10,14 @@ export function Navbar() {
   const [activeSection, setActiveSection] = useState("home");
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  // Framer Motion smooth scroll progress
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 28,
+    restDelta: 0.001,
+  });
 
   // Sync with user's system preference or stored theme
   useEffect(() => {
@@ -139,46 +147,59 @@ export function Navbar() {
           })}
 
           {/* Theme Toggle Button */}
-          <button
+          <motion.button
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
             onClick={toggleTheme}
             className="p-2.5 text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors rounded-sm min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
             aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
             title={`Toggle ${theme === "light" ? "Dark" : "Light"} Mode`}
           >
             {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4 text-amber-400" />}
-          </button>
+          </motion.button>
 
           {/* Resume CTA */}
-          <a
+          <motion.a
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
             href={siteConfig.cvPath}
             target="_blank"
             rel="noopener noreferrer"
             className="ml-2 px-4 py-2.5 text-xs font-medium text-[var(--color-background)] bg-[var(--color-foreground)] hover:bg-[var(--color-accent)] transition-colors rounded-sm min-h-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-accent)]"
           >
             Resume (PDF)
-          </a>
+          </motion.a>
         </div>
 
         {/* Mobile menu toggle & theme */}
         <div className="flex items-center gap-2 md:hidden">
-          <button
+          <motion.button
+            whileHover={{ scale: 1.08 }}
+            whileTap={{ scale: 0.92 }}
             onClick={toggleTheme}
             className="p-2 text-[var(--color-muted)] hover:text-[var(--color-foreground)] min-h-[44px] min-w-[44px] flex items-center justify-center rounded-sm"
             aria-label="Toggle theme"
           >
             {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4 text-amber-400" />}
-          </button>
+          </motion.button>
 
-          <button
+          <motion.button
+            whileTap={{ scale: 0.92 }}
             onClick={() => setIsMobileOpen(!isMobileOpen)}
             className="p-2 text-[var(--color-foreground)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
             aria-label={isMobileOpen ? "Close navigation menu" : "Open navigation menu"}
             aria-expanded={isMobileOpen}
           >
             {isMobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          </motion.button>
         </div>
       </nav>
+
+      {/* Framer Motion Scroll Progress Indicator */}
+      <motion.div
+        className="absolute bottom-0 left-0 right-0 h-[2px] bg-[var(--color-accent)] origin-left pointer-events-none"
+        style={{ scaleX }}
+      />
 
       {/* Mobile Drawer */}
       <AnimatePresence>

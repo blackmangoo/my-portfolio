@@ -3,6 +3,7 @@
 import { skillGroups } from "@/data/skills";
 import { MotionWrapper } from "./MotionWrapper";
 import { Brain, Layers, Server, Monitor, Terminal } from "lucide-react";
+import { motion } from "framer-motion";
 
 export function SkillsSection() {
   const iconMap: Record<string, React.ReactNode> = {
@@ -33,7 +34,11 @@ export function SkillsSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
           {skillGroups.map((group, index) => (
             <MotionWrapper key={group.category} delay={index * 0.08}>
-              <div className="flex flex-col p-6 rounded-sm border border-[var(--color-border)] bg-[var(--color-panel)] transition-colors">
+              <motion.div
+                whileHover={{ y: -4, borderColor: "var(--color-accent)" }}
+                transition={{ type: "spring", stiffness: 350, damping: 22 }}
+                className="flex flex-col p-6 rounded-sm border border-[var(--color-border)] bg-[var(--color-panel)] transition-colors shadow-sm"
+              >
                 <div className="flex items-center gap-3 mb-4 pb-3 border-b border-[var(--color-border)]">
                   {iconMap[group.icon]}
                   <h3 className="text-base font-semibold text-[var(--color-foreground)]">
@@ -43,13 +48,18 @@ export function SkillsSection() {
 
                 <ul className="grid grid-cols-2 gap-y-2.5 gap-x-4">
                   {group.skills.map((skill) => (
-                    <li key={skill} className="text-xs font-mono text-[var(--color-foreground)]/80 flex items-center gap-1.5">
+                    <motion.li
+                      key={skill}
+                      whileHover={{ x: 3 }}
+                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                      className="text-xs font-mono text-[var(--color-foreground)]/80 flex items-center gap-1.5 cursor-default"
+                    >
                       <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)]/60" />
                       <span>{skill}</span>
-                    </li>
+                    </motion.li>
                   ))}
                 </ul>
-              </div>
+              </motion.div>
             </MotionWrapper>
           ))}
         </div>

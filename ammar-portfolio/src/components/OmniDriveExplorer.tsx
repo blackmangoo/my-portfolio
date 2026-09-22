@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Activity, Cpu, Database, Eye, Smartphone, Zap, Play, Pause } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface PipelineStep {
   id: string;
@@ -237,21 +238,30 @@ export function OmniDriveExplorer() {
         </div>
       </div>
 
-      {/* Pipeline Navigation Horizontal Steps */}
+      {/* Pipeline Navigation Horizontal Steps with Framer Motion Layout Springs */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mb-8">
         {pipelineSteps.map((step) => {
           const Icon = step.icon;
           const isSelected = selectedStep === step.id;
           return (
-            <button
+            <motion.button
               key={step.id}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => setSelectedStep(step.id)}
-              className={`p-3 rounded-sm text-left transition-all border flex flex-col justify-between min-h-[85px] ${
+              className={`relative p-3 rounded-sm text-left transition-colors border flex flex-col justify-between min-h-[85px] z-10 ${
                 isSelected
-                  ? "bg-[var(--color-accent)]/10 border-[var(--color-accent)] shadow-sm"
+                  ? "border-[var(--color-accent)] shadow-sm"
                   : "bg-[var(--color-background)] border-[var(--color-border)] hover:border-[var(--color-foreground)]/30"
               }`}
             >
+              {isSelected && (
+                <motion.div
+                  layoutId="activePipelineStepHighlight"
+                  className="absolute inset-0 bg-[var(--color-accent)]/10 rounded-sm -z-10"
+                  transition={{ type: "spring", stiffness: 450, damping: 32 }}
+                />
+              )}
               <div className="flex items-center justify-between w-full">
                 <Icon className={`w-4 h-4 ${isSelected ? "text-[var(--color-accent)]" : "text-[var(--color-muted)]"}`} />
                 <span className="text-[10px] font-mono text-[var(--color-accent)] font-medium">{step.latency}</span>
@@ -262,62 +272,71 @@ export function OmniDriveExplorer() {
                 </div>
                 <div className="text-[10px] text-[var(--color-muted)] truncate">{step.category}</div>
               </div>
-            </button>
+            </motion.button>
           );
         })}
       </div>
 
-      {/* Deep Dive Panel */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        {/* Left: Metadata & Live Kalman Filter Sparkline (7 cols) */}
-        <div className="lg:col-span-7 flex flex-col gap-4">
-          <div className="p-4 bg-[var(--color-background)] border border-[var(--color-border)] rounded-sm">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-mono text-[var(--color-muted)]">Live Sensor Denoising (Kalman vs Raw)</span>
-              <div className="flex items-center gap-3 text-[11px] font-mono">
-                <span className="flex items-center gap-1.5 text-orange-500">
-                  <span className="w-2.5 h-0.5 bg-orange-500 inline-block" /> Raw Noise
-                </span>
-                <span className="flex items-center gap-1.5 text-emerald-500 font-semibold">
-                  <span className="w-2.5 h-1 bg-emerald-500 inline-block" /> Denoised State
-                </span>
+      {/* Deep Dive Panel with AnimatePresence */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeStep.id}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.22, ease: "easeOut" }}
+          className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start"
+        >
+          {/* Left: Metadata & Live Kalman Filter Sparkline (7 cols) */}
+          <div className="lg:col-span-7 flex flex-col gap-4">
+            <div className="p-4 bg-[var(--color-background)] border border-[var(--color-border)] rounded-sm">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-mono text-[var(--color-muted)]">Live Sensor Denoising (Kalman vs Raw)</span>
+                <div className="flex items-center gap-3 text-[11px] font-mono">
+                  <span className="flex items-center gap-1.5 text-orange-500">
+                    <span className="w-2.5 h-0.5 bg-orange-500 inline-block" /> Raw Noise
+                  </span>
+                  <span className="flex items-center gap-1.5 text-emerald-500 font-semibold">
+                    <span className="w-2.5 h-1 bg-emerald-500 inline-block" /> Denoised State
+                  </span>
+                </div>
+              </div>
+              <canvas
+                ref={canvasRef}
+                width={540}
+                height={140}
+                className="w-full h-[140px] bg-black/5 dark:bg-black/30 rounded-sm"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div className="p-3 border border-[var(--color-border)] bg-[var(--color-background)] rounded-sm">
+                <span className="text-[10px] uppercase font-mono text-[var(--color-muted)] block mb-1">Tensor Input</span>
+                <span className="font-mono text-[var(--color-foreground)]">{activeStep.tensorInput}</span>
+              </div>
+              <div className="p-3 border border-[var(--color-border)] bg-[var(--color-background)] rounded-sm">
+                <span className="text-[10px] uppercase font-mono text-[var(--color-muted)] block mb-1">Tensor Output</span>
+                <span className="font-mono text-[var(--color-accent)] font-semibold">{activeStep.tensorOutput}</span>
               </div>
             </div>
-            <canvas
-              ref={canvasRef}
-              width={540}
-              height={140}
-              className="w-full h-[140px] bg-black/5 dark:bg-black/30 rounded-sm"
-            />
+
+            <p className="text-sm text-[var(--color-muted)] leading-relaxed">
+              {activeStep.description}
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div className="p-3 border border-[var(--color-border)] bg-[var(--color-background)] rounded-sm">
-              <span className="text-[10px] uppercase font-mono text-[var(--color-muted)] block mb-1">Tensor Input</span>
-              <span className="font-mono text-[var(--color-foreground)]">{activeStep.tensorInput}</span>
+          {/* Right: Real Implementation Code Snippet (5 cols) */}
+          <div className="lg:col-span-5 flex flex-col">
+            <div className="flex items-center justify-between px-4 py-2 bg-[#1A1A1A] text-white/80 rounded-t-sm text-xs font-mono border-b border-white/10">
+              <span>{activeStep.id}.py</span>
+              <span className="text-[10px] text-emerald-400 font-medium">Production Verified</span>
             </div>
-            <div className="p-3 border border-[var(--color-border)] bg-[var(--color-background)] rounded-sm">
-              <span className="text-[10px] uppercase font-mono text-[var(--color-muted)] block mb-1">Tensor Output</span>
-              <span className="font-mono text-[var(--color-accent)] font-semibold">{activeStep.tensorOutput}</span>
-            </div>
+            <pre className="p-4 bg-[#141414] text-emerald-200/90 font-mono text-xs overflow-x-auto rounded-b-sm leading-relaxed max-h-[260px]">
+              <code>{activeStep.codeSnippet}</code>
+            </pre>
           </div>
-
-          <p className="text-sm text-[var(--color-muted)] leading-relaxed">
-            {activeStep.description}
-          </p>
-        </div>
-
-        {/* Right: Real Implementation Code Snippet (5 cols) */}
-        <div className="lg:col-span-5 flex flex-col">
-          <div className="flex items-center justify-between px-4 py-2 bg-[#1A1A1A] text-white/80 rounded-t-sm text-xs font-mono border-b border-white/10">
-            <span>{activeStep.id}.py</span>
-            <span className="text-[10px] text-emerald-400 font-medium">Production Verified</span>
-          </div>
-          <pre className="p-4 bg-[#141414] text-emerald-200/90 font-mono text-xs overflow-x-auto rounded-b-sm leading-relaxed max-h-[260px]">
-            <code>{activeStep.codeSnippet}</code>
-          </pre>
-        </div>
-      </div>
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }

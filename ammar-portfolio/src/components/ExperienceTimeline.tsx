@@ -3,6 +3,7 @@
 import { experiences } from "@/data/experience";
 import { MotionWrapper } from "./MotionWrapper";
 import { Briefcase, GraduationCap } from "lucide-react";
+import { motion } from "framer-motion";
 
 export function ExperienceTimeline() {
   return (
@@ -41,8 +42,12 @@ export function ExperienceTimeline() {
                   </div>
                 </div>
 
-                {/* Role Details (Right Column) */}
-                <div className="md:w-3/4 p-6 bg-[var(--color-background)] border border-[var(--color-border)] rounded-sm">
+                {/* Role Details (Right Column) with interactive spring hover */}
+                <motion.div
+                  whileHover={{ y: -3, borderColor: "var(--color-accent)" }}
+                  transition={{ type: "spring", stiffness: 350, damping: 22 }}
+                  className="md:w-3/4 p-6 bg-[var(--color-background)] border border-[var(--color-border)] rounded-sm shadow-sm transition-colors"
+                >
                   <h3 className="text-base sm:text-lg font-semibold text-[var(--color-foreground)] mb-1">
                     {exp.role}
                   </h3>
@@ -58,7 +63,7 @@ export function ExperienceTimeline() {
                       </li>
                     ))}
                   </ul>
-                </div>
+                </motion.div>
               </div>
             </MotionWrapper>
           ))}

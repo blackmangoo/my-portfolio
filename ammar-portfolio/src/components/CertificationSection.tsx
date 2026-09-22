@@ -80,21 +80,27 @@ export function CertificationSection() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
           {siteConfig.certifications.map((cert, index) => (
             <MotionWrapper key={index} delay={index * 0.1}>
-              <div className="flex flex-col p-6 rounded-sm border border-[var(--color-border)] bg-[var(--color-background)] hover:border-[var(--color-accent)] transition-colors">
+              <motion.div
+                whileHover={{ y: -4, borderColor: "var(--color-accent)" }}
+                transition={{ type: "spring", stiffness: 350, damping: 22 }}
+                className="flex flex-col p-6 rounded-sm border border-[var(--color-border)] bg-[var(--color-background)] transition-colors shadow-sm"
+              >
                 <div className="text-xs text-[var(--color-muted)] font-medium mb-1">{cert.dates}</div>
                 <h3 className="text-base font-semibold text-[var(--color-foreground)] mb-1">{cert.title}</h3>
                 <div className="text-sm font-medium text-[var(--color-accent)] mb-3">{cert.organization}</div>
                 <p className="text-sm text-[var(--color-muted)] mb-5 leading-relaxed">{cert.details}</p>
 
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
                   onClick={(e) => openModal(cert.imagePath, cert.title, e)}
                   className="inline-flex items-center gap-2 text-xs font-medium text-[var(--color-foreground)] border border-[var(--color-border)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] px-4 py-2.5 rounded-sm w-fit transition-colors min-h-[44px] min-w-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
                   aria-haspopup="dialog"
                 >
                   <span>View Certificate</span>
                   <ExternalLink className="w-3.5 h-3.5" aria-hidden="true" />
-                </button>
-              </div>
+                </motion.button>
+              </motion.div>
             </MotionWrapper>
           ))}
         </div>

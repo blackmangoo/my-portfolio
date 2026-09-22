@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, type Variants } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 import type { ReactNode } from "react";
 
 // ─── Shared Animation Variants ──────────────────────────────────────────────
@@ -9,18 +9,16 @@ export const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
-    transition: { staggerChildren: 0.15, delayChildren: 0.1 },
+    transition: { staggerChildren: 0.1, delayChildren: 0.05 },
   },
 };
 
 export const staggerItem: Variants = {
-  hidden: { opacity: 0, y: 50, scale: 0.9, filter: "blur(10px)" },
+  hidden: { opacity: 0, y: 24 },
   visible: {
     opacity: 1,
     y: 0,
-    scale: 1,
-    filter: "blur(0px)",
-    transition: { type: "spring" as const, damping: 20, stiffness: 100 },
+    transition: { type: "spring", damping: 24, stiffness: 120 },
   },
 };
 
@@ -40,17 +38,22 @@ export function MotionWrapper({
   children,
   className = "",
   stagger = false,
-  margin = "-100px",
+  margin = "-60px",
   delay = 0,
 }: MotionWrapperProps) {
-  const customFadeUp = {
-    hidden: { opacity: 0, y: 50, scale: 0.95, filter: "blur(10px)" },
+  const shouldReduceMotion = useReducedMotion();
+
+  const customFadeUp: Variants = {
+    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 24 },
     visible: {
       opacity: 1,
       y: 0,
-      scale: 1,
-      filter: "blur(0px)",
-      transition: { type: "spring" as const, damping: 20, stiffness: 100, delay },
+      transition: {
+        type: "spring",
+        damping: 24,
+        stiffness: 120,
+        delay: shouldReduceMotion ? 0 : delay,
+      },
     },
   };
 

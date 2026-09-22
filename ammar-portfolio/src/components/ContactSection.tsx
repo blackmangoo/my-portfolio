@@ -3,6 +3,7 @@
 import { siteConfig } from "@/data/site";
 import { MotionWrapper } from "./MotionWrapper";
 import { ArrowUp, Mail, Linkedin, Github, Phone, MapPin } from "lucide-react";
+import { motion } from "framer-motion";
 
 export function ContactSection() {
   const currentYear = new Date().getFullYear();
@@ -29,26 +30,36 @@ export function ContactSection() {
 
             {/* Quick Info Grid */}
             <div className="flex flex-wrap gap-6 mb-10 text-xs text-[var(--color-muted)] font-mono">
-              <div className="flex items-center gap-2">
+              <motion.div
+                whileHover={{ scale: 1.04 }}
+                className="flex items-center gap-2 p-2 rounded bg-[var(--color-panel)] border border-[var(--color-border)] cursor-default"
+              >
                 <MapPin className="w-4 h-4 text-[var(--color-accent)]" />
                 <span>Lahore, Pakistan (PKT, UTC+5)</span>
-              </div>
-              <div className="flex items-center gap-2">
+              </motion.div>
+              <motion.div
+                whileHover={{ scale: 1.04 }}
+                className="flex items-center gap-2 p-2 rounded bg-[var(--color-panel)] border border-[var(--color-border)] cursor-default"
+              >
                 <Phone className="w-4 h-4 text-[var(--color-accent)]" />
                 <span>{siteConfig.phone}</span>
-              </div>
+              </motion.div>
             </div>
 
             {/* Primary Action Buttons */}
             <div className="flex flex-wrap gap-4">
-              <a
+              <motion.a
+                whileHover={{ scale: 1.03, y: -2 }}
+                whileTap={{ scale: 0.97 }}
                 href={`mailto:${siteConfig.email}`}
                 className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[var(--color-foreground)] text-[var(--color-background)] text-sm font-medium hover:bg-[var(--color-accent)] transition-colors rounded-sm min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-accent)]"
               >
                 <Mail className="w-4 h-4" />
                 <span>Send an Email</span>
-              </a>
-              <a
+              </motion.a>
+              <motion.a
+                whileHover={{ scale: 1.03, y: -2 }}
+                whileTap={{ scale: 0.97 }}
                 href={siteConfig.linkedin}
                 target="_blank"
                 rel="noreferrer"
@@ -56,7 +67,7 @@ export function ContactSection() {
               >
                 <Linkedin className="w-4 h-4" />
                 <span>Connect on LinkedIn</span>
-              </a>
+              </motion.a>
             </div>
           </div>
         </MotionWrapper>
@@ -68,7 +79,8 @@ export function ContactSection() {
           </div>
 
           <div className="flex items-center gap-6">
-            <a
+            <motion.a
+              whileHover={{ scale: 1.05 }}
               href={siteConfig.github}
               target="_blank"
               rel="noreferrer"
@@ -76,15 +88,17 @@ export function ContactSection() {
             >
               <Github className="w-3.5 h-3.5" />
               <span>GitHub</span>
-            </a>
-            <button
+            </motion.a>
+            <motion.button
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.92 }}
               onClick={scrollToTop}
               className="inline-flex items-center gap-1.5 hover:text-[var(--color-foreground)] transition-colors min-h-[44px] focus-visible:outline-none focus-visible:underline"
               aria-label="Scroll back to top"
             >
               <span>Top</span>
               <ArrowUp className="w-3.5 h-3.5" />
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
