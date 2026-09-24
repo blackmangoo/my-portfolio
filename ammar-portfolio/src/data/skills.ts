@@ -21,13 +21,13 @@ export const skillGroups: SkillGroup[] = [
     skills: ['FastAPI', 'REST APIs', 'PostgreSQL', 'Supabase', 'Firebase', 'Node.js'],
   },
   {
-    category: 'Frontend',
+    category: 'Frontend & 3D WebGL',
     icon: 'monitor',
-    skills: ['Flutter', 'React', 'Next.js', 'Streamlit'],
+    skills: ['Three.js', 'React Three Fiber', 'WebGL', 'GSAP', 'Next.js', 'Flutter', 'React', 'Tailwind CSS'],
   },
   {
     category: 'Infrastructure & Tools',
     icon: 'terminal',
-    skills: ['Docker', 'Git', 'GitHub Actions', 'Vercel', 'n8n', 'Postman'],
+    skills: ['Docker', 'Git', 'GitHub Actions', 'Vercel', 'Streamlit', 'n8n'],
   },
 ];

@@ -75,6 +75,27 @@ const KNOWLEDGE_BASE: { keywords: string[]; answer: string; tags: string[]; link
     tags: ["LoRA Fine-Tuning", "PyTorch", "Hugging Face"],
   },
   {
+    keywords: ["ferrari", "laferrari", "hypercar", "3d car", "auto engineering", "aerodinamica"],
+    answer:
+      "Ammar built the Ferrari LaFerrari 3D Engineering & Aerodynamics Showcase! It is an interactive 3D WebGL / React Three Fiber experience featuring high-poly PBR metallic car paint shaders, continuous 3D scroll rotation across 7 technical stages, real-time Web Audio V12 engine sound synthesis (startup, 9,250 RPM revving, track flyby), and an interactive Atelier Maranello 3D paint configurator.",
+    tags: ["Three.js", "React Three Fiber", "WebGL", "Web Audio API"],
+    link: { label: "Launch Ferrari 3D Experience", href: "https://auto-engineering-3d-frk6.vercel.app/" },
+  },
+  {
+    keywords: ["rolex", "calibre", "3235", "horology", "watch", "perpetual", "deconstruction"],
+    answer:
+      "Ammar engineered the Rolex Calibre 3235 Haute Horlogerie 3D Deconstruction! It features a continuous-scroll mechanical movement deconstruction scrubbing through 240 high-resolution WebP frames in a 60 FPS HTML5 Canvas loop, driven by GSAP ScrollTrigger and Lenis inertial smooth scrolling, with mechanical ticking sound design and a bespoke timepiece configurator.",
+    tags: ["GSAP ScrollTrigger", "Lenis", "HTML5 Canvas", "Haute Horlogerie"],
+    link: { label: "Launch Rolex Calibre Experience", href: "https://rolex-calibre-horology.vercel.app/" },
+  },
+  {
+    keywords: ["three.js", "threejs", "webgl", "r3f", "3d", "graphics", "canvas"],
+    answer:
+      "Ammar has extensive expertise in Three.js, React Three Fiber, WebGL, custom GLSL shaders, and GSAP animation. Notable 3D productions include the Ferrari LaFerrari 3D Hypercar Experience (R3F + Web Audio), the Rolex Calibre 3235 240-frame Canvas deconstruction, and the interactive 4-mode WebGL visualizer in his portfolio hero.",
+    tags: ["Three.js", "WebGL", "React Three Fiber", "GSAP"],
+    link: { label: "Explore 3D Projects", href: "#projects" },
+  },
+  {
     keywords: ["contact", "hire", "email", "phone", "availability", "role"],
     answer:
       "Ammar is actively seeking full-time AI/ML Engineering and Full-Stack AI Developer roles. You can reach him directly at ammar.akbar2002@gmail.com or connect via LinkedIn.",
@@ -93,11 +114,11 @@ const UNRELATED_CODE_PATTERNS = [
 ];
 
 const SUGGESTIONS = [
+  "Show me your 3D WebGL projects (Ferrari & Rolex)",
   "Does Ammar know Git and Docker?",
   "What can Ammar do for my team?",
   "Explain the OmniDrive YOLOv11 & Kalman setup",
   "What is Ammar's FAST-NUCES background?",
-  "Tell me about the AI Job Application Agent",
 ];
 
 export function RecruiterAgent() {

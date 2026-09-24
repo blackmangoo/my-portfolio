@@ -2,6 +2,7 @@
 
 export type ProjectCategory =
   | "All"
+  | "Interactive 3D & WebGL"
   | "Computer Vision"
   | "LLM & Agents"
   | "Sensor Fusion & Edge"
@@ -31,6 +32,7 @@ export interface FlagshipProject {
   description: string;
   projectType: string;
   github: string;
+  liveUrl?: string;
   category: ProjectCategory;
   stack: string[];
   metrics: OmniDriveMetric[];
@@ -47,6 +49,7 @@ export interface FeaturedProject {
   stack: string[];
   highlights: string[];
   github: string;
+  liveUrl?: string;
   metrics?: { value: string; label: string }[];
   architecture?: string[];
 }
@@ -57,6 +60,7 @@ export interface MinorProject {
   category: ProjectCategory;
   stack?: string[];
   github?: string;
+  liveUrl?: string;
 }
 
 // ─── Flagship Project: OmniDrive AI ──────────────────────────────────────────
@@ -140,6 +144,83 @@ export const omniDrive: FlagshipProject = {
 // ─── Featured Core AI & Engineering Projects ──────────────────────────────────
 
 export const featuredProjects: FeaturedProject[] = [
+  {
+    title: "Ferrari LaFerrari: 3D Engineering & Aerodynamics Showcase",
+    subtitle: "Interactive WebGL Hypercar Experience with 963 CV HY-KERS V12 & Audio Synthesis",
+    category: "Interactive 3D & WebGL",
+    description:
+      "A high-fidelity 3D WebGL and React Three Fiber engineering exploration of the Ferrari LaFerrari. Features a high-poly 3D model with custom physically based rendering (PBR) metallic car paint shaders, continuous 3D scroll rotation across 7 technical stages, real-time Web Audio V12 engine acoustics, and a bespoke Maranello configurator.",
+    stack: [
+      "React 19",
+      "React Three Fiber",
+      "Three.js",
+      "Drei",
+      "WebGL",
+      "Web Audio API",
+      "Tailwind CSS",
+      "GSAP",
+    ],
+    liveUrl: "https://auto-engineering-3d-frk6.vercel.app/",
+    github: "https://github.com/blackmangoo/auto-engineering-3d",
+    metrics: [
+      { value: "963 CV", label: "HY-KERS Powertrain" },
+      { value: "60 FPS", label: "WebGL 3D Rendering" },
+      { value: "7 Stages", label: "Choreographed Journey" },
+      { value: "3 Modes", label: "V12 Audio Synthesizer" },
+    ],
+    highlights: [
+      "High-poly 3D WebGL model with studio HDR reflections, metallic clear-coat shaders, and carbon fiber composite materials.",
+      "7-stage scroll choreography covering active aerodynamics (Aerodinamica Attiva), 963 CV HY-KERS powertrain, and composite chassis.",
+      "Real-time Web Audio V12 synthesizer simulating 6.3L engine ignition, 9,250 RPM revving, and track flybys.",
+      "Atelier Maranello 3D configurator with live exterior paint switching (Rosso Corsa, Giallo Modena, Nero Stellato, Grigio Silverstone, Blu Tour de France).",
+      "Cinema View mode providing distraction-free 3D orbit inspection and responsive touch controls.",
+    ],
+    architecture: [
+      "High-Poly GLB Model",
+      "PBR Shaders & HDR",
+      "7-Stage Scroll Choreography",
+      "Web Audio V12 Engine",
+      "Atelier 3D Configurator",
+    ],
+  },
+  {
+    title: "Rolex Calibre 3235: Haute Horlogerie 3D Deconstruction",
+    subtitle: "Continuous Scroll Movement Deconstruction with 240-Frame Canvas Scrubbing & Atelier Configurator",
+    category: "Interactive 3D & WebGL",
+    description:
+      "An ultra-luxury interactive continuous-scroll deconstruction of the legendary Rolex Calibre 3235 mechanical movement. Features a high-performance 240-frame Canvas 2D render loop scrubbed via GSAP ScrollTrigger, Lenis inertial smooth scrolling, mechanical ticking sound design, and an Atelier commission configurator.",
+    stack: [
+      "React 19",
+      "HTML5 Canvas 2D Engine",
+      "GSAP ScrollTrigger",
+      "Lenis Smooth Scroll",
+      "Web Audio API",
+      "Tailwind CSS",
+      "TypeScript",
+    ],
+    liveUrl: "https://rolex-calibre-horology.vercel.app/",
+    github: "https://github.com/blackmangoo",
+    metrics: [
+      { value: "240 Frames", label: "Canvas Scrubbing" },
+      { value: "-2/+2 s/d", label: "Superlative Chronometer" },
+      { value: "28,800 VPH", label: "4Hz Chronergy Escapement" },
+      { value: "70 Hours", label: "Autonomous Power Reserve" },
+    ],
+    highlights: [
+      "60 FPS continuous scroll deconstruction scrubbing through 240 high-resolution WebP frames detailing mechanical levitation and the blue Parachrom hairspring.",
+      "Deep technical breakdown of Genevan horology: 14 patents, Chronergy escapement, Paraflex shock absorbers, and microscopic anglage/perlage finish.",
+      "Interactive timepiece configurator allowing users to customize dial faces, precious metal case alloys, and bracelet ergonomics with VIP commission dispatch.",
+      "Spatial Web Audio integration delivering authentic mechanical movement ticks and crown winding feedback.",
+      "Lenis inertial smooth scrolling tightly synchronized with GSAP ScrollTrigger pinning and scrub timelines.",
+    ],
+    architecture: [
+      "240-Frame WebP Manifest",
+      "HTML5 Canvas 2D Loop",
+      "GSAP ScrollTrigger & Lenis",
+      "Web Audio Soundscape",
+      "Atelier Timepiece Configurator",
+    ],
+  },
   {
     title: "AI Job Application Agent",
     subtitle: "Autonomous Multi-Agent Pipeline with Human-in-the-Loop Review",
