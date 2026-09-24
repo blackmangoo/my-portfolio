@@ -304,12 +304,50 @@ export const featuredProjects: FeaturedProject[] = [
     github: "https://github.com/blackmangoo",
   },
   {
+    title: "Verto Digital: Websites & AI Automation Platform",
+    subtitle: "Production Digital Agency Platform with Canvas Scroll-Scrubbing & AI Workflows",
+    category: "Systems & Web",
+    description:
+      "Production digital growth agency platform for vertodigital.tech, delivering high-conversion websites paired with practical AI — reception assistants, WhatsApp lead-capture workflows, online booking, and canvas scroll-scrubbing interactions.",
+    stack: [
+      "Next.js 15+",
+      "React 19",
+      "Tailwind CSS",
+      "HTML5 Canvas",
+      "Framer Motion",
+      "n8n / AI Workflows",
+      "TypeScript",
+    ],
+    liveUrl: "https://www.vertodigital.tech",
+    github: "https://github.com/blackmangoo/verto-digital-site",
+    metrics: [
+      { value: "Live", label: "Production Domain" },
+      { value: "60 FPS", label: "Canvas Scrubbing" },
+      { value: "4-in-1", label: "AI Workflows & Lead Gen" },
+      { value: "< 0.05", label: "CLS Core Web Vitals" },
+    ],
+    highlights: [
+      "High-conversion Next.js App Router architecture deployed on custom domain (vertodigital.tech).",
+      "Smooth 60 FPS HTML5 canvas scroll-scrubbing sequence integrated into the editorial layout.",
+      "Practical AI workflows: automated reception assistants, WhatsApp lead nurturing, and client booking.",
+      "Showcases selected client systems including Protomotive Car Care and Lumina Dental Studio.",
+    ],
+    architecture: [
+      "Next.js App Router",
+      "Canvas Scroll-Scrub Engine",
+      "Framer Motion Interactions",
+      "AI WhatsApp & Booking Gateway",
+      "Vercel Edge Network",
+    ],
+  },
+  {
     title: "Protomotive Car Care Studio",
     subtitle: "High-Performance Interactive Digital Showcase",
     category: "Systems & Web",
     description:
       "High-end detailing studio showcase engineered with Next.js App Router, GSAP timeline choreography, Lenis inertial smooth scrolling, and Tailwind CSS v4.",
     stack: ["Next.js 15+", "Tailwind CSS v4", "GSAP", "Lenis", "TypeScript"],
+    liveUrl: "https://protomotive-demo.vercel.app/",
     metrics: [
       { value: "100", label: "Lighthouse Performance" },
       { value: "60 FPS", label: "Animation Budget" },
@@ -352,10 +390,9 @@ export const minorProjects: MinorProject[] = [
     stack: ["Python", "Scikit-Learn", "XGBoost"],
   },
   {
-    title: "Verto Digital Agency Platform",
-    tagline: "High-conversion digital growth agency platform with dynamic Framer Motion interactions.",
+    title: "Smart Exam Sitting Plan Optimizer",
+    tagline: "Automated exam hall seating allocation using K-Means clustering to prevent malpractice.",
     category: "Systems & Web",
-    stack: ["React", "Next.js", "Tailwind CSS"],
-    github: "https://github.com/blackmangoo/verto-digital-site",
+    stack: ["Python", "Scikit-Learn", "NumPy"],
   },
 ];
