@@ -96,13 +96,6 @@ const KNOWLEDGE_BASE: { keywords: string[]; answer: string; tags: string[]; link
     link: { label: "Explore 3D Projects", href: "#projects" },
   },
   {
-    keywords: ["verto", "vertodigital", "verto digital", "agency", "client", "website automation"],
-    answer:
-      "Verto Digital (vertodigital.tech) is Ammar's live digital agency platform! It pairs high-conversion Next.js websites with practical business AI—including AI reception assistants, automated WhatsApp lead follow-ups, online ordering/booking, and 60 FPS HTML5 canvas scroll-scrubbing interactions.",
-    tags: ["Next.js", "AI Automation", "WhatsApp Bot", "Canvas Scrubbing"],
-    link: { label: "Visit Verto Digital", href: "https://www.vertodigital.tech" },
-  },
-  {
     keywords: ["contact", "hire", "email", "phone", "availability", "role"],
     answer:
       "Ammar is actively seeking full-time AI/ML Engineering and Full-Stack AI Developer roles. You can reach him directly at ammar.akbar2002@gmail.com or connect via LinkedIn.",
