@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { FeaturedProjects } from "@/components/FeaturedProjects";
+import { ClientDeliveriesSection } from "@/components/ClientDeliveriesSection";
 import { ExperienceTimeline } from "@/components/ExperienceTimeline";
 import { SkillsSection } from "@/components/SkillsSection";
 import { CertificationSection } from "@/components/CertificationSection";
@@ -41,6 +42,7 @@ export default function Home() {
       <Hero />
       <AboutSection />
       <FeaturedProjects />
+      <ClientDeliveriesSection />
       <ExperienceTimeline />
       <SkillsSection />
       <CertificationSection />

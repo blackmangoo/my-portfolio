@@ -96,6 +96,27 @@ const KNOWLEDGE_BASE: { keywords: string[]; answer: string; tags: string[]; link
     link: { label: "Explore 3D Projects", href: "#projects" },
   },
   {
+    keywords: ["fine burger", "fineburger", "restaurant", "rider panel", "kds", "food", "kitchen"],
+    answer:
+      "Ammar engineered and delivered a complete 3-portal commercial ecosystem for Fine Burger & Fast Food (https://www.fineburger.pk/). It includes a customer PWA for menu ordering and address map pinning, an admin Kitchen Display System (KDS) with sound buzzers and expense analytics, and a dedicated mobile rider dispatch app with WhatsApp links, navigation, and cash reconciliation—freeing the restaurant from 25–30% delivery commission cuts.",
+    tags: ["Fine Burger", "React 19", "Firebase", "PWA", "Delivered Client Work"],
+    link: { label: "View Fine Burger Delivery", href: "#clients" },
+  },
+  {
+    keywords: ["grab torque", "grabtorque", "freight", "logistics", "dispatch", "load board"],
+    answer:
+      "Ammar built the complete enterprise digital platform for Grab Torque (https://grabtorque.com/). It unifies two high-leverage divisions: an Autonomous AI Software Engineering showcase with a 4-stage document ingestion inspector, and an Elite Freight Logistics portal featuring live nationwide corridor telemetry, dynamic weekly gross revenue calculators, and wholesale DAT One/Truckstop carrier integrations.",
+    tags: ["Grab Torque", "Three.js", "TypeScript", "GSAP", "Delivered Client Work"],
+    link: { label: "View Grab Torque Delivery", href: "#clients" },
+  },
+  {
+    keywords: ["clients", "client work", "commercial", "testimonials", "reviews", "freelance"],
+    answer:
+      "Ammar has delivered turnkey commercial production platforms for clients, notably: (1) Fine Burger & Fast Food (complete 3-portal customer, kitchen KDS, and rider delivery fleet ecosystem) and (2) Grab Torque (enterprise dual-division AI software and freight logistics platform). Both clients have verified 5-star reviews on his portfolio!",
+    tags: ["Client Deliveries", "5-Star Reviews", "Commercial Software"],
+    link: { label: "Read Client Reviews", href: "#clients" },
+  },
+  {
     keywords: ["contact", "hire", "email", "phone", "availability", "role"],
     answer:
       "Ammar is actively seeking full-time AI/ML Engineering and Full-Stack AI Developer roles. You can reach him directly at ammar.akbar2002@gmail.com or connect via LinkedIn.",
@@ -114,11 +135,11 @@ const UNRELATED_CODE_PATTERNS = [
 ];
 
 const SUGGESTIONS = [
+  "Tell me about your client work (Fine Burger & Grab Torque)",
   "Show me your 3D WebGL projects (Ferrari & Rolex)",
   "Does Ammar know Git and Docker?",
   "What can Ammar do for my team?",
   "Explain the OmniDrive YOLOv11 & Kalman setup",
-  "What is Ammar's FAST-NUCES background?",
 ];
 
 export function RecruiterAgent() {
