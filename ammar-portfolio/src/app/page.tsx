@@ -6,7 +6,6 @@ import { ExperienceTimeline } from "@/components/ExperienceTimeline";
 import { SkillsSection } from "@/components/SkillsSection";
 import { CertificationSection } from "@/components/CertificationSection";
 import { ContactSection } from "@/components/ContactSection";
-import { RecruiterAgent } from "@/components/RecruiterAgent";
 import { MotionWrapper } from "@/components/MotionWrapper";
 
 function AboutSection() {
@@ -47,7 +46,6 @@ export default function Home() {
       <SkillsSection />
       <CertificationSection />
       <ContactSection />
-      <RecruiterAgent />
     </main>
   );
 }

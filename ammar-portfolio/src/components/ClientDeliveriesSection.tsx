@@ -11,8 +11,8 @@ import {
   UtensilsCrossed,
   MonitorCheck,
   ShieldCheck,
-  Sparkles,
   ArrowUpRight,
+  Briefcase,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -21,41 +21,18 @@ function ClientCard({ client }: { client: ClientProject }) {
   const isFood = client.id === "fine-burger";
 
   return (
-    <div
-      className={`relative rounded-sm border p-6 sm:p-10 transition-all overflow-hidden ${
-        isFood
-          ? "border-amber-500/25 bg-gradient-to-b from-amber-500/[0.04] via-[var(--color-panel)] to-[var(--color-panel)] shadow-sm hover:border-amber-500/40"
-          : "border-cyan-500/25 bg-gradient-to-b from-cyan-500/[0.04] via-[var(--color-panel)] to-[var(--color-panel)] shadow-sm hover:border-cyan-500/40"
-      }`}
-    >
-      {/* Background ambient decorative glow */}
-      <div
-        className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full blur-3xl opacity-20"
-        style={{
-          background: isFood
-            ? "radial-gradient(circle, #FFB400 0%, transparent 70%)"
-            : "radial-gradient(circle, #00F0FF 0%, transparent 70%)",
-        }}
-        aria-hidden="true"
-      />
-
+    <div className="relative rounded-sm border border-[var(--color-border)] p-6 sm:p-10 bg-[var(--color-panel)] shadow-sm hover:border-[var(--color-accent)]/50 transition-all overflow-hidden">
       {/* Top Meta Bar */}
       <div className="relative z-10 flex flex-wrap items-center justify-between gap-3 pb-6 border-b border-[var(--color-border)]">
         <div className="flex flex-wrap items-center gap-2.5">
-          <span
-            className={`inline-flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-semibold uppercase tracking-wider rounded-full ${
-              isFood
-                ? "text-amber-700 dark:text-amber-400 bg-amber-500/10 border border-amber-500/30"
-                : "text-amber-700 dark:text-amber-300 bg-amber-500/10 border border-amber-500/30"
-            }`}
-          >
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-semibold uppercase tracking-wider rounded-full text-[var(--color-accent)] bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20">
             {isFood ? <UtensilsCrossed className="w-3.5 h-3.5" /> : <Building2 className="w-3.5 h-3.5" />}
             <span>{client.badge}</span>
           </span>
 
           <span className="text-xs font-mono text-[var(--color-muted)] flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <span>Delivered & Live in Production</span>
+            <span>Live in Production</span>
           </span>
         </div>
 
@@ -65,14 +42,9 @@ function ClientCard({ client }: { client: ClientProject }) {
           href={client.liveUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-sm transition-all shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
-          style={{
-            backgroundColor: isFood ? "#FFB400" : "#0E1110",
-            color: isFood ? "#1A1A1A" : "#00F0FF",
-            border: isFood ? "1px solid #D97706" : "1px solid rgba(0, 240, 255, 0.4)",
-          }}
+          className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-sm transition-all shadow-sm bg-[var(--color-foreground)] text-[var(--color-background)] hover:bg-[var(--color-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
         >
-          <span>Launch Live Platform</span>
+          <span>Launch Platform</span>
           <ArrowUpRight className="w-3.5 h-3.5" />
         </motion.a>
       </div>
@@ -94,7 +66,7 @@ function ClientCard({ client }: { client: ClientProject }) {
           <div className="p-4 rounded-sm border border-[var(--color-border)] bg-[var(--color-background)] mb-6">
             <div className="flex items-center gap-2 mb-1.5 text-xs font-mono font-semibold text-[var(--color-foreground)] uppercase tracking-wider">
               <ShieldCheck className="w-4 h-4 text-emerald-500" />
-              <span>Commercial Transformation & Impact</span>
+              <span>Business Results</span>
             </div>
             <p className="text-xs sm:text-sm text-[var(--color-foreground)]/85 leading-relaxed">
               {client.businessImpact}
@@ -105,7 +77,7 @@ function ClientCard({ client }: { client: ClientProject }) {
           <div>
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-xs font-semibold text-[var(--color-foreground)] uppercase tracking-wider">
-                Full Systems Delivered (Click to Inspect)
+                Delivered Modules (Click to Inspect)
               </h4>
               <span className="text-[11px] font-mono text-[var(--color-muted)]">
                 {activeTab + 1} of {client.deliverables.length}
@@ -194,12 +166,7 @@ function ClientCard({ client }: { client: ClientProject }) {
           </div>
 
           {/* Verified Owner Review Card */}
-          <div
-            className="relative rounded-sm border p-6 bg-[var(--color-background)] shadow-sm transition-all"
-            style={{
-              borderColor: isFood ? "rgba(255, 180, 0, 0.4)" : "rgba(0, 240, 255, 0.4)",
-            }}
-          >
+          <div className="relative rounded-sm border border-[var(--color-border)] p-6 bg-[var(--color-background)] shadow-sm transition-all">
             {/* Review Card Header */}
             <div className="flex items-start justify-between gap-3 mb-4">
               <div>
@@ -213,13 +180,13 @@ function ClientCard({ client }: { client: ClientProject }) {
                   ))}
                 </div>
                 <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-[var(--color-muted)]">
-                  Verified Client Review
+                  Client Feedback
                 </span>
               </div>
 
               <span className="inline-flex items-center gap-1 px-2.5 py-1 text-[10px] font-mono text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
                 <CheckCircle className="w-3 h-3 text-emerald-500" />
-                <span>Verified Owner</span>
+                <span>Verified Client</span>
               </span>
             </div>
 
@@ -275,14 +242,14 @@ export function ClientDeliveriesSection() {
         <MotionWrapper>
           <div className="mb-14">
             <span className="text-xs font-mono uppercase tracking-wider text-[var(--color-accent)] font-semibold flex items-center gap-2">
-              <Sparkles className="w-3.5 h-3.5 text-[var(--color-accent)]" />
-              <span>Commercial Deliveries & Founder Reviews</span>
+              <Briefcase className="w-3.5 h-3.5 text-[var(--color-accent)]" />
+              <span>Commercial Deliveries & Client Reviews</span>
             </span>
             <h2 className="text-3xl sm:text-4xl font-semibold text-[var(--color-foreground)] tracking-tight mt-1 mb-3">
               Production Client Systems
             </h2>
             <p className="text-base sm:text-lg text-[var(--color-muted)] max-w-2xl leading-relaxed">
-              Full-scale platforms engineered and delivered directly to business owners and enterprise co-founders, verified in live production.
+              Complete production software engineered and delivered directly to business owners, verified in active daily use.
             </p>
           </div>
         </MotionWrapper>

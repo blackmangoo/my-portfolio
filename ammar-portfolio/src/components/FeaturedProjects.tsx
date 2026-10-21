@@ -76,7 +76,11 @@ function CaseStudy({ project, isFlagship = false }: { project: ProjectItem; isFl
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-xs font-semibold px-4 py-2.5 bg-[var(--color-foreground)] text-[var(--color-background)] hover:bg-[var(--color-accent)] transition-colors rounded-sm shadow-sm min-h-[44px]"
               >
-                <span>Launch Live 3D Experience</span>
+                <span>
+                  {project.category === "Interactive 3D & WebGL"
+                    ? "Launch 3D Experience"
+                    : "View Live Project"}
+                </span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </motion.a>
             )}

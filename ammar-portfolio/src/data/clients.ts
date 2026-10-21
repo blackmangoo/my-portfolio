@@ -53,9 +53,9 @@ export const clientProjects: ClientProject[] = [
     liveUrl: "https://www.fineburger.pk/",
     tagline: "Custom 3-Portal Direct Ordering, Kitchen KDS & Courier Dispatch Ecosystem",
     overview:
-      "Fine Burger & Fast Food (Est. 1981, Lahore) needed to escape exorbitant 25–30% aggregator platform commissions (Foodpanda). I designed, engineered, and delivered a 100% owned, real-time 3-portal restaurant operating ecosystem—unifying consumer ordering, live kitchen operations, and dedicated courier logistics.",
+      "Fine Burger & Fast Food (Est. 1981, Lahore) needed to eliminate high aggregator platform commissions (Foodpanda). I designed, engineered, and delivered a complete direct ordering ecosystem: customer web ordering, a real-time kitchen display system (KDS), and an in-house courier dispatch application.",
     businessImpact:
-      "Eliminated 3rd-party commission leakage on direct orders, streamlined kitchen preparation time down to under 12 minutes, and automated dispatch across in-house delivery couriers with real-time GPS coordinate pinning.",
+      "Eliminated 3rd-party commissions on direct orders, reduced kitchen prep time to under 12 minutes, and automated dispatch across in-house couriers with interactive address map pinning.",
     brandColors: {
       primary: "#D97706",
       accent: "#FFB400",
@@ -64,31 +64,31 @@ export const clientProjects: ClientProject[] = [
       gradient: "from-[#FFB400]/20 via-[#D97706]/10 to-transparent",
     },
     metrics: [
-      { value: "0%", label: "Aggregator Commission (100% Owned)" },
-      { value: "3-in-1", label: "Synced Portals (Customer, KDS, Courier)" },
+      { value: "0%", label: "Third-Party Aggregator Cut" },
+      { value: "3 Apps", label: "Customer, Kitchen KDS, Courier Fleet" },
       { value: "< 100ms", label: "Live Order Synchronization" },
       { value: "30 Min", label: "Average Delivery Turnaround" },
     ],
     deliverables: [
       {
-        title: "Customer PWA Ordering Platform",
+        title: "Customer Web Ordering App",
         badge: "Live on fineburger.pk",
         description:
-          "Progressive Web App with fast menu catalog, dynamic combo customization, interactive Lahore map address pinning, cart state persistence, and real-time live order progress.",
+          "Progressive web application with dynamic combo selection, address map pinning with reverse geocoding, cart state persistence, and live order tracking.",
         url: "https://www.fineburger.pk/",
       },
       {
         title: "Kitchen Display & Admin Console (KDS)",
         badge: "Internal Operational Console",
         description:
-          "Live kitchen order queue with audio buzzer alerts on new incoming orders, 1-click inventory/item toggles, courier assignment, manual order entry, and daily sales/expense analytics.",
+          "Live order queue with audio buzzer alerts on incoming tickets, 1-click stock toggles, courier assignment, and daily sales/expense reporting.",
         url: "https://fineburger-admin.vercel.app/",
       },
       {
-        title: "Rider Delivery Fleet Web App",
+        title: "Courier Delivery Fleet App",
         badge: "Mobile Dispatch Tool",
         description:
-          "Mobile-first courier portal featuring shift toggles, live dispatch alerts, 1-tap WhatsApp and direct phone calls, turn-by-turn navigation, and cash-on-delivery collection reconciliation.",
+          "Mobile-first courier portal featuring shift toggles, live order assignment alerts, 1-tap WhatsApp/calling, turn-by-turn navigation, and cash-on-delivery tracking.",
         url: "https://finerider.vercel.app/",
       },
     ],
@@ -110,8 +110,8 @@ export const clientProjects: ClientProject[] = [
       rating: 5,
       verified: true,
       date: "October 2026",
-      highlightText: "We eliminated third-party commission cuts entirely and gained full control over our kitchen and delivery operations.",
-      text: "Ammar completely transformed how we run Fine Burger. Previously, we were losing 25% to 30% on every single order to delivery aggregators. Ammar built us our own direct system from scratch: the customer website is blazing fast, the kitchen buzzer never misses an order, and our delivery boys have their own app with maps and call buttons. Order accuracy is at 100% and our customer retention has surged. Highly recommended engineer who understands real business needs.",
+      highlightText: "We gained full control over our kitchen and delivery operations, and our repeat customers love ordering directly from us.",
+      text: "Ammar built our entire direct ordering platform from the ground up. Before this, third-party delivery apps were eating 25% to 30% of every order. With our own customer ordering site, kitchen display, and rider app, we have full control over our orders, delivery timing is faster, and our repeat customers love ordering directly from us. He delivered exactly what our business needed.",
     },
   },
   {
@@ -122,9 +122,9 @@ export const clientProjects: ClientProject[] = [
     liveUrl: "https://grabtorque.com/",
     tagline: "Autonomous AI Software Engineering & Elite Freight Logistics Digital Presence",
     overview:
-      "Engineered the complete, ultra-luxury digital platform for Grab Torque—a dual-division enterprise delivering custom autonomous AI agents and software engineering alongside nationwide freight dispatching and wholesale broker load board subscriptions.",
+      "Engineered the production digital platform for Grab Torque — an enterprise operating two core divisions: custom autonomous AI software development and nationwide freight logistics with wholesale broker load board subscriptions.",
     businessImpact:
-      "Crafted an Awwwards-tier visual language that elevated enterprise conversion, featuring an interactive 4-stage autonomous AI processing pipeline, dynamic weekly freight gross revenue tickers, real-time corridor telemetry, and responsive 3D WebGL scenes.",
+      "Built a clear, high-performance web experience that communicates both technical AI capabilities and freight dispatch operations to prospective enterprise clients and carrier partners.",
     brandColors: {
       primary: "#D4AF37",
       accent: "#00F0FF",
@@ -133,31 +133,31 @@ export const clientProjects: ClientProject[] = [
       gradient: "from-[#D4AF37]/20 via-[#00F0FF]/10 to-transparent",
     },
     metrics: [
-      { value: "60 FPS", label: "Butter-Smooth WebGL & Canvas" },
-      { value: "Dual-Division", label: "Integrated AI & Freight Architecture" },
+      { value: "60 FPS", label: "Three.js WebGL & Canvas Engine" },
+      { value: "Dual-Division", label: "AI Software & Freight Logistics" },
       { value: "< 0.05", label: "CLS (Zero Layout Shift)" },
-      { value: "100%", label: "Custom Component Engineering" },
+      { value: "100%", label: "Custom Component Architecture" },
     ],
     deliverables: [
       {
-        title: "Autonomous AI Software Pipeline Showcase",
+        title: "Autonomous AI Software Showcase",
         badge: "Division 1: AI & Tech",
         description:
-          "Interactive 4-stage document ingestion simulation (OCR, multi-agent reasoning core, database mutations), live JSON-LD payload inspector, and 3D sentinel construction visualizer.",
+          "Interactive 4-stage document ingestion simulation (OCR, multi-agent reasoning, database updates), live JSON payload inspector, and 3D visualizer.",
         url: "https://grabtorque.com/",
       },
       {
-        title: "Elite Freight Logistics & Telemetry Hub",
+        title: "Freight Logistics & Telemetry Hub",
         badge: "Division 2: Logistics",
         description:
-          "Interactive nationwide GPS freight corridors (Chicago, Dallas, Atlanta, Houston), dynamic weekly gross revenue projection slider (scaling to $12,450/wk), and trailer capacity visualizers.",
+          "Interactive nationwide GPS freight corridors (Chicago, Dallas, Atlanta, Houston), dynamic weekly gross revenue calculator, and trailer capacity visualizers.",
         url: "https://grabtorque.com/",
       },
       {
-        title: "Carrier Subscription & Integration Portal",
+        title: "Carrier Subscription Portal",
         badge: "SaaS Workflow",
         description:
-          "Comprehensive subscription portal integrating DAT One, Truckstop, 123Loadboard, and Sylectus wholesale feeds with automated lead qualification flows.",
+          "Carrier subscription portal integrating DAT One, Truckstop, 123Loadboard, and Sylectus wholesale feeds with automated onboarding flows.",
         url: "https://grabtorque.com/",
       },
     ],
@@ -178,8 +178,8 @@ export const clientProjects: ClientProject[] = [
       rating: 5,
       verified: true,
       date: "October 2026",
-      highlightText: "Ammar delivered an Awwwards-caliber digital experience that immediately established our credibility with tech clients and freight carriers.",
-      text: "Working with Ammar was an absolute masterclass in frontend engineering and creative design. We needed our website to represent two distinct, complex businesses—Autonomous AI software on one hand, and high-stakes freight dispatch on the other—without confusing visitors. Ammar designed and built a breathtaking, ultra-smooth platform with custom 3D elements, interactive pipeline inspectors, and real-time calculators. He took complete ownership of the technical implementation and delivered ahead of schedule.",
+      highlightText: "Ammar delivered a fast, ultra-smooth 3D platform ahead of schedule and solved complex frontend challenges without needing hand-holding.",
+      text: "Ammar took complete ownership of our web platform from day one. We needed our site to clearly separate our autonomous AI software services from our freight dispatch business without confusing visitors. Ammar delivered a fast, ultra-smooth 3D experience with custom interactive pipelines ahead of schedule. He's proactive, technical, and solved complex frontend challenges without needing hand-holding.",
     },
   },
 ];
