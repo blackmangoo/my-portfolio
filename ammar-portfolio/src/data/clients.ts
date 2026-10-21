@@ -14,7 +14,7 @@ export interface ClientReview {
   clientName: string;
   clientRole: string;
   companyName: string;
-  location: string;
+  location?: string;
   rating: number;
   verified: boolean;
   date: string;
@@ -103,8 +103,8 @@ export const clientProjects: ClientProject[] = [
       "Web Audio API",
     ],
     review: {
-      clientName: "Muhammad Aneeb",
-      clientRole: "Owner & Managing Director",
+      clientName: "Momin",
+      clientRole: "Owner & Operator",
       companyName: "Fine Burger & Fast Food (Since 1981)",
       location: "Baghbanpura, Lahore",
       rating: 5,
@@ -122,7 +122,7 @@ export const clientProjects: ClientProject[] = [
     liveUrl: "https://grabtorque.com/",
     tagline: "Autonomous AI Software Engineering & Elite Freight Logistics Digital Presence",
     overview:
-      "Engineered the complete, ultra-luxury digital platform for Grab Torque (Dallas, TX / International)—a dual-division enterprise delivering custom autonomous AI agents and software engineering alongside nationwide freight dispatching and wholesale broker load board subscriptions.",
+      "Engineered the complete, ultra-luxury digital platform for Grab Torque—a dual-division enterprise delivering custom autonomous AI agents and software engineering alongside nationwide freight dispatching and wholesale broker load board subscriptions.",
     businessImpact:
       "Crafted an Awwwards-tier visual language that elevated enterprise conversion, featuring an interactive 4-stage autonomous AI processing pipeline, dynamic weekly freight gross revenue tickers, real-time corridor telemetry, and responsive 3D WebGL scenes.",
     brandColors: {
@@ -175,7 +175,6 @@ export const clientProjects: ClientProject[] = [
       clientName: "Awaiz & Aneeb",
       clientRole: "Co-Founders (CEO & CTO)",
       companyName: "Grab Torque",
-      location: "Dallas, TX / Logistics & AI",
       rating: 5,
       verified: true,
       date: "October 2026",

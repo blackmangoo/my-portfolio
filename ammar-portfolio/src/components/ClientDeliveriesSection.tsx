@@ -243,7 +243,8 @@ function ClientCard({ client }: { client: ClientProject }) {
                   {client.review.clientRole}
                 </div>
                 <div className="text-[10px] text-[var(--color-muted)]">
-                  {client.review.companyName} • {client.review.location}
+                  {client.review.companyName}
+                  {client.review.location ? ` • ${client.review.location}` : ""}
                 </div>
               </div>
               <span className="text-[10px] font-mono text-[var(--color-muted)]">{client.review.date}</span>

@@ -36,7 +36,7 @@ ${featuredProjects
 - Secondary: ${minorProjects.map((m) => `${m.title} (${m.tagline})`).join("; ")}.
 
 ### Delivered Commercial Client Work & Reviews:
-- Fine Burger & Fast Food (https://www.fineburger.pk/): Engineered and delivered a complete 3-portal restaurant operating ecosystem (Customer Ordering PWA, Admin & Kitchen KDS console with audio buzzer alerts, and Rider delivery fleet dispatch app). Replaced 25–30% delivery commission cuts with 100% owned direct ordering. Owner Review: 5 Stars from Muhammad Aneeb (Owner & Managing Director, Fine Burger Since 1981, Lahore).
+- Fine Burger & Fast Food (https://www.fineburger.pk/): Engineered and delivered a complete 3-portal restaurant operating ecosystem (Customer Ordering PWA, Admin & Kitchen KDS console with audio buzzer alerts, and Rider delivery fleet dispatch app). Replaced 25–30% delivery commission cuts with 100% owned direct ordering. Owner Review: 5 Stars from Momin (Owner & Operator, Fine Burger Since 1981, Lahore).
 - Grab Torque (https://grabtorque.com/): Engineered the complete dual-division digital platform for Grab Torque (Division 1: Autonomous AI Software Engineering with interactive 4-stage document ingestion telemetry; Division 2: Elite Freight Logistics with nationwide GPS corridor tracking and live weekly gross tickers). Founder Review: 5 Stars from Awaiz (CEO) & Aneeb (CTO).
 
 ### Work Experience:

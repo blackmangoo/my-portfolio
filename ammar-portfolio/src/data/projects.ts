@@ -329,7 +329,7 @@ export const featuredProjects: FeaturedProject[] = [
       "Autonomous AI Division showcase with live 4-stage document ingestion simulation and telemetric JSON payload inspector.",
       "Elite Freight Logistics division featuring interactive nationwide GPS freight corridors (Chicago, Dallas, Atlanta, Houston).",
       "Dynamic weekly gross revenue projection slider scaling from $0 to $12,450/week per tractor with real-time rate metrics.",
-      "Delivered turnkey for the founders (Awaiz & Aneeb) with production deployment and zero performance regression.",
+      "Delivered turnkey for the Grab Torque founders with production deployment and zero performance regression.",
     ],
     architecture: [
       "Vite React 19 Frontend",
