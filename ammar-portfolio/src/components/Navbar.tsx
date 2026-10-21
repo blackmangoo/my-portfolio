@@ -122,8 +122,7 @@ export function Navbar() {
             {siteConfig.shortName}
           </button>
 
-          <span className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono text-[var(--color-accent)] bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 rounded-full">
-            <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] animate-pulse" />
+          <span className="hidden xl:inline-flex items-center px-2.5 py-1 text-[11px] font-mono text-[var(--color-accent)] bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 rounded-full">
             <span>Open to AI Roles</span>
           </span>
         </div>

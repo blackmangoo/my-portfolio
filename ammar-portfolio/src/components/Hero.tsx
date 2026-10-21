@@ -56,8 +56,7 @@ export function Hero() {
 
           {/* Availability Status Chip */}
           <motion.div variants={heroItemVariants} className="mb-6 flex items-center gap-3">
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-[var(--color-accent)] bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 rounded-full">
-              <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)]" />
+            <span className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-[var(--color-accent)] bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 rounded-full">
               {siteConfig.hero.cta}
             </span>
           </motion.div>

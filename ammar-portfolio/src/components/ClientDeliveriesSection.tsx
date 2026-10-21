@@ -30,9 +30,8 @@ function ClientCard({ client }: { client: ClientProject }) {
             <span>{client.badge}</span>
           </span>
 
-          <span className="text-xs font-mono text-[var(--color-muted)] flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <span>Live in Production</span>
+          <span className="text-xs font-mono text-[var(--color-muted)]">
+            Live in Production
           </span>
         </div>
 

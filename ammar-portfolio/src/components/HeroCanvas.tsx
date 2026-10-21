@@ -5,101 +5,201 @@ import { Canvas, useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 
-// Pure deterministic pseudo-random generator for idempotent renders
-function seededRandom(seed: number): number {
-  const x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
-  return x - Math.floor(x);
+// ─── 1. Forward-Propagating Real Neural Network ─────────────────────────────
+
+interface Synapse {
+  src: THREE.Vector3;
+  dst: THREE.Vector3;
+  weight: number;
+  layerIdx: number;
 }
 
-// ─── Neural Network Synaptic Backing ────────────────────────────────────────
+interface SignalPulse {
+  synapseIdx: number;
+  progress: number;
+  speed: number;
+}
 
-const NN_LAYERS = [4, 6, 6, 2];
-const NN_LAYER_SPACING = 2.4;
-const NN_NODE_SPACING = 0.95;
+const LAYER_CONFIG = [5, 8, 8, 4]; // Input (5) -> Hidden 1 (8) -> Hidden 2 (8) -> Output (4)
+const LAYER_X = [-3.8, -1.3, 1.3, 3.8];
+const NUM_PULSES = 54;
 
 function NeuralNetwork() {
   const groupRef = useRef<THREE.Group>(null);
 
-  const { flatNodes, lines } = useMemo(() => {
-    let seed = 1;
-    const pts: THREE.Vector3[][] = [];
-    const flat: number[] = [];
-    let startX = (-(NN_LAYERS.length - 1) * NN_LAYER_SPACING) / 2;
+  // Generate deterministic layered architecture
+  const { nodePositions, linePositions, synapses } = useMemo(() => {
+    const nodesByLayer: THREE.Vector3[][] = [];
+    const flatNodeCoords: number[] = [];
 
-    for (let i = 0; i < NN_LAYERS.length; i++) {
-      const numNodes = NN_LAYERS[i];
-      const startY = (-(numNodes - 1) * NN_NODE_SPACING) / 2;
-      const layerPts: THREE.Vector3[] = [];
+    // 1. Build Layer Neurons
+    for (let l = 0; l < LAYER_CONFIG.length; l++) {
+      const count = LAYER_CONFIG[l];
+      const layerNodes: THREE.Vector3[] = [];
+      const totalSpan = (count - 1) * 0.65;
+      const startY = -totalSpan / 2;
 
-      for (let j = 0; j < numNodes; j++) {
-        const pt = new THREE.Vector3(
-          startX + (seededRandom(seed++) - 0.5) * 0.3,
-          startY + j * NN_NODE_SPACING + (seededRandom(seed++) - 0.5) * 0.3,
-          (seededRandom(seed++) - 0.5) * 1.4 - 1.2
-        );
-        layerPts.push(pt);
-        flat.push(pt.x, pt.y, pt.z);
+      for (let i = 0; i < count; i++) {
+        const y = startY + i * 0.65;
+        // Subtle 3D curvature wrapping behind the face
+        const z = -1.2 - Math.sin((l / (LAYER_CONFIG.length - 1)) * Math.PI) * 0.5;
+        const pt = new THREE.Vector3(LAYER_X[l], y, z);
+        layerNodes.push(pt);
+        flatNodeCoords.push(pt.x, pt.y, pt.z);
       }
-      pts.push(layerPts);
-      startX += NN_LAYER_SPACING;
+      nodesByLayer.push(layerNodes);
     }
 
-    const lineCoords: number[] = [];
-    for (let i = 0; i < pts.length - 1; i++) {
-      for (const nodeA of pts[i]) {
-        for (const nodeB of pts[i + 1]) {
-          if (seededRandom(seed++) > 0.38) {
-            lineCoords.push(nodeA.x, nodeA.y, nodeA.z);
-            lineCoords.push(nodeB.x, nodeB.y, nodeB.z);
-          }
+    // 2. Build Synaptic Weight Connections (Adjacent Layers)
+    const allSynapses: Synapse[] = [];
+    const flatLineCoords: number[] = [];
+
+    for (let l = 0; l < LAYER_CONFIG.length - 1; l++) {
+      const currentLayer = nodesByLayer[l];
+      const nextLayer = nodesByLayer[l + 1];
+
+      for (let i = 0; i < currentLayer.length; i++) {
+        const src = currentLayer[i];
+        for (let j = 0; j < nextLayer.length; j++) {
+          const dst = nextLayer[j];
+          // Connect with high density to reflect a real fully connected feedforward network
+          const weight = 0.35 + ((i * 7 + j * 13) % 10) * 0.06;
+          allSynapses.push({ src, dst, weight, layerIdx: l });
+          flatLineCoords.push(src.x, src.y, src.z, dst.x, dst.y, dst.z);
         }
       }
     }
 
     return {
-      flatNodes: new Float32Array(flat),
-      lines: new Float32Array(lineCoords),
+      nodePositions: new Float32Array(flatNodeCoords),
+      linePositions: new Float32Array(flatLineCoords),
+      synapses: allSynapses,
     };
   }, []);
 
+  // BufferGeometry for dynamic pulse positions
+  const pulseGeometry = useMemo(() => {
+    const geo = new THREE.BufferGeometry();
+    const pos = new Float32Array(NUM_PULSES * 3);
+    geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    return geo;
+  }, []);
+
+  // Mutable pulse animation states stored in ref
+  const pulsesRef = useRef<SignalPulse[]>(
+    Array.from({ length: NUM_PULSES }, (_, p) => ({
+      synapseIdx: Math.floor((p / NUM_PULSES) * synapses.length),
+      progress: p / NUM_PULSES,
+      speed: 0.35 + ((p * 37) % 10) * 0.035,
+    }))
+  );
+
   useFrame((state, delta) => {
-    if (!groupRef.current) return;
-    const t = state.clock.elapsedTime;
-    groupRef.current.rotation.y = THREE.MathUtils.damp(
-      groupRef.current.rotation.y,
-      Math.sin(t * 0.2) * 0.15 + state.pointer.x * 0.25,
-      3,
-      delta
-    );
-    groupRef.current.position.y = Math.sin(t * 0.4) * 0.08;
-    groupRef.current.position.x = THREE.MathUtils.damp(
-      groupRef.current.position.x,
-      state.pointer.x * 0.3,
-      3,
-      delta
-    );
+    const pulses = pulsesRef.current;
+    const posAttr = pulseGeometry.getAttribute("position") as THREE.BufferAttribute;
+    const array = posAttr.array as Float32Array;
+
+    // 1. Advance Forward-Propagation Signal Pulses
+    for (let p = 0; p < pulses.length; p++) {
+      const pulse = pulses[p];
+      pulse.progress += delta * pulse.speed;
+
+      // When pulse reaches destination neuron, step forward to next layer or loop back
+      if (pulse.progress >= 1.0) {
+        pulse.progress = 0.0;
+        const currentSyn = synapses[pulse.synapseIdx];
+        const nextLayerIdx = (currentSyn.layerIdx + 1) % (LAYER_CONFIG.length - 1);
+
+        // Find candidate synapses in the next layer
+        const candidateIndices = synapses
+          .map((s, idx) => (s.layerIdx === nextLayerIdx ? idx : -1))
+          .filter((idx) => idx !== -1);
+
+        if (candidateIndices.length > 0) {
+          const pick = Math.floor(Math.random() * candidateIndices.length);
+          pulse.synapseIdx = candidateIndices[pick];
+        }
+      }
+
+      // Linear interpolation between source and destination neuron
+      const syn = synapses[pulse.synapseIdx];
+      const x = syn.src.x + (syn.dst.x - syn.src.x) * pulse.progress;
+      const y = syn.src.y + (syn.dst.y - syn.src.y) * pulse.progress;
+      const z = syn.src.z + (syn.dst.z - syn.src.z) * pulse.progress;
+
+      array[p * 3] = x;
+      array[p * 3 + 1] = y;
+      array[p * 3 + 2] = z;
+    }
+
+    posAttr.needsUpdate = true;
+
+    // 2. Subtle ambient 3D parallax tracking with cursor
+    if (groupRef.current) {
+      const t = state.clock.elapsedTime;
+      const targetParallaxX = state.pointer.x * 0.2;
+      const targetParallaxY = -state.pointer.y * 0.15;
+      const targetRotY = state.pointer.x * 0.12 + Math.sin(t * 0.25) * 0.04;
+      const targetRotX = -state.pointer.y * 0.08;
+
+      groupRef.current.position.x = THREE.MathUtils.damp(
+        groupRef.current.position.x,
+        targetParallaxX,
+        3,
+        delta
+      );
+      groupRef.current.position.y = THREE.MathUtils.damp(
+        groupRef.current.position.y,
+        targetParallaxY,
+        3,
+        delta
+      );
+      groupRef.current.rotation.y = THREE.MathUtils.damp(
+        groupRef.current.rotation.y,
+        targetRotY,
+        3,
+        delta
+      );
+      groupRef.current.rotation.x = THREE.MathUtils.damp(
+        groupRef.current.rotation.x,
+        targetRotX,
+        3,
+        delta
+      );
+    }
   });
 
   return (
-    <group ref={groupRef} position={[0, 0, -1.5]}>
-      {/* Synaptic connection lines */}
+    <group ref={groupRef} position={[0, 0, -1.0]}>
+      {/* 1. Synaptic Axons (Connections with calibrated weight transparency) */}
       <lineSegments>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[lines, 3]} />
+          <bufferAttribute attach="attributes-position" args={[linePositions, 3]} />
         </bufferGeometry>
-        <lineBasicMaterial color="#2C5545" transparent opacity={0.16} />
+        <lineBasicMaterial color="#2C5545" transparent opacity={0.14} />
       </lineSegments>
 
-      {/* Nodes */}
+      {/* 2. Layer Neurons (Nodes) */}
       <points>
         <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[flatNodes, 3]} />
+          <bufferAttribute attach="attributes-position" args={[nodePositions, 3]} />
         </bufferGeometry>
         <pointsMaterial
-          size={0.14}
+          size={0.16}
           color="#2C5545"
           transparent
-          opacity={0.65}
+          opacity={0.8}
+          sizeAttenuation
+        />
+      </points>
+
+      {/* 3. Real-Time Forward Propagation Pulses (Signals flowing left -> right) */}
+      <points geometry={pulseGeometry}>
+        <pointsMaterial
+          size={0.18}
+          color="#10B981"
+          transparent
+          opacity={0.95}
           sizeAttenuation
         />
       </points>
@@ -107,7 +207,7 @@ function NeuralNetwork() {
   );
 }
 
-// ─── Biometric Face Point Cloud ─────────────────────────────────────────────
+// ─── 2. Biometric Face Point Cloud with Natural Head Pose ───────────────────
 
 function FacePointCloud() {
   const pointsRef = useRef<THREE.Points>(null);
@@ -126,34 +226,47 @@ function FacePointCloud() {
   useFrame((state, delta) => {
     if (!pointsRef.current) return;
 
-    // Fluid pointer tracking
-    const targetX = (state.pointer.x * Math.PI) / 0.85;
-    const targetY = (state.pointer.y * Math.PI) / 0.95 - 0.2;
+    // Natural human head rotation bounds:
+    // Yaw (left-right): max ~22 degrees (+/- 0.38 rad)
+    // Pitch (up-down): max ~14 degrees (+/- 0.24 rad)
+    // Roll (subtle neck bank): max ~3.5 degrees (+/- 0.06 rad)
+    const targetYaw = state.pointer.x * 0.38;
+    const targetPitch = -state.pointer.y * 0.22 - 0.08;
+    const targetRoll = -state.pointer.x * 0.06;
 
+    // Muscular neck easing with delta-time damping
     pointsRef.current.rotation.y = THREE.MathUtils.damp(
       pointsRef.current.rotation.y,
-      targetX,
-      5,
+      targetYaw,
+      4.5,
       delta
     );
     pointsRef.current.rotation.x = THREE.MathUtils.damp(
       pointsRef.current.rotation.x,
-      -targetY,
-      5,
+      targetPitch,
+      4.5,
+      delta
+    );
+    pointsRef.current.rotation.z = THREE.MathUtils.damp(
+      pointsRef.current.rotation.z,
+      targetRoll,
+      4.5,
       delta
     );
 
-    // Natural subtle breathing hover
-    pointsRef.current.position.y =
-      -1.25 + Math.sin(state.clock.elapsedTime * 1.1) * 0.06;
+    // Natural breathing hover
+    const t = state.clock.elapsedTime;
+    pointsRef.current.position.y = -1.1 + Math.sin(t * 1.0) * 0.04;
+    pointsRef.current.position.x = Math.sin(t * 0.5) * 0.02;
   });
 
   if (!geometry) return null;
 
   return (
-    <points ref={pointsRef} geometry={geometry} scale={0.065} position={[0, -1.25, 0]}>
+    // Zoomed out scale (0.052 vs previous 0.065) with comfortable framing
+    <points ref={pointsRef} geometry={geometry} scale={0.052} position={[0, -1.1, 0.2]}>
       <pointsMaterial
-        size={0.036}
+        size={0.035}
         color="#2C5545"
         sizeAttenuation
         transparent
@@ -163,13 +276,14 @@ function FacePointCloud() {
   );
 }
 
-// ─── Clean, Focused Hero Canvas ─────────────────────────────────────────────
+// ─── 3. Clean, Natural Hero Canvas ──────────────────────────────────────────
 
 export function HeroCanvas() {
   return (
-    <div className="relative w-full h-[380px] sm:h-[480px] lg:h-[580px] flex items-center justify-center pointer-events-none lg:pointer-events-auto">
+    <div className="relative w-full h-[380px] sm:h-[480px] lg:h-[600px] flex items-center justify-center pointer-events-none lg:pointer-events-auto">
       <div className="w-full h-full relative cursor-default touch-pan-y">
-        <Canvas camera={{ position: [0, 0, 4.8], fov: 52 }} dpr={[1, 2]}>
+        {/* Zoomed out camera position [0, 0, 5.5] with balanced 48 FOV */}
+        <Canvas camera={{ position: [0, 0, 5.5], fov: 48 }} dpr={[1, 2]}>
           <ambientLight intensity={0.5} />
           <Suspense fallback={null}>
             <NeuralNetwork />
@@ -177,8 +291,8 @@ export function HeroCanvas() {
           </Suspense>
         </Canvas>
 
-        {/* Ambient subtle gradient fade on the left edge to blend seamlessly with typography */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-background)] via-transparent to-transparent pointer-events-none w-24" />
+        {/* Subtle left-side gradient fade into the typography */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-background)] via-transparent to-transparent pointer-events-none w-20" />
       </div>
     </div>
   );
