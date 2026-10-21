@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { siteConfig } from "@/data/site";
 import { ArrowDown, FileText, Github } from "lucide-react";
 import { motion, type Variants } from "framer-motion";
+import { PhysicsDroplet } from "./PhysicsDroplet";
 
 // Dynamically import the WebGL 3D Canvas with ssr: false to guarantee fast FCP
 const HeroCanvas = dynamic(
@@ -64,10 +65,15 @@ export function Hero() {
           {/* Master Headline */}
           <motion.h1
             variants={heroItemVariants}
-            className="text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight text-[var(--color-foreground)] leading-[1.12] mb-6"
+            className="text-4xl sm:text-5xl lg:text-6xl font-medium tracking-tight text-[var(--color-foreground)] leading-[1.12] mb-3"
           >
             Engineering <span className="text-[var(--color-accent)] font-semibold">applied AI</span> from model weights to production systems.
           </motion.h1>
+
+          {/* Kinetic Fluid Physics Droplet with Scroll-Coupled Velocity */}
+          <motion.div variants={heroItemVariants} className="my-1">
+            <PhysicsDroplet />
+          </motion.div>
 
           {/* Subheadline with clear value proposition */}
           <motion.p
