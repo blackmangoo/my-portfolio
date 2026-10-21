@@ -64,7 +64,7 @@ export function CertificationSection() {
   }, [selectedImage]);
 
   return (
-    <section id="certifications" className="py-24 relative z-10 bg-[var(--color-panel)] border-t border-[var(--color-border)] transition-colors">
+    <section id="certifications" className="py-24 relative z-10 bg-[var(--color-panel)] border-t border-[var(--color-border)] transition-colors scroll-mt-16">
       <div className="max-w-4xl mx-auto px-6">
         <MotionWrapper>
           <div className="mb-12">

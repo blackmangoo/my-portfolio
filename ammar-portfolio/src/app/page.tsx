@@ -11,7 +11,7 @@ import { MotionWrapper } from "@/components/MotionWrapper";
 
 function AboutSection() {
   return (
-    <section id="about" className="py-24 bg-[var(--color-background)] transition-colors border-t border-[var(--color-border)]">
+    <section id="about" className="py-24 bg-[var(--color-background)] transition-colors border-t border-[var(--color-border)] scroll-mt-16">
       <div className="max-w-4xl mx-auto px-6">
         <MotionWrapper>
           <span className="text-xs font-mono uppercase tracking-wider text-[var(--color-accent)] font-semibold">
@@ -40,10 +40,10 @@ export default function Home() {
     <main className="min-h-screen relative bg-[var(--color-background)] text-[var(--color-foreground)] selection:bg-[var(--color-accent)]/15 selection:text-[var(--color-accent)] transition-colors">
       <Navbar />
       <Hero />
-      <AboutSection />
       <FeaturedProjects />
       <ClientDeliveriesSection />
       <ExperienceTimeline />
+      <AboutSection />
       <SkillsSection />
       <CertificationSection />
       <ContactSection />

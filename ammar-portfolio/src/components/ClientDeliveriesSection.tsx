@@ -270,7 +270,7 @@ function ClientCard({ client }: { client: ClientProject }) {
 
 export function ClientDeliveriesSection() {
   return (
-    <section id="clients" className="py-24 relative z-10 bg-[var(--color-background)] border-t border-[var(--color-border)] transition-colors">
+    <section id="clients" className="py-24 relative z-10 bg-[var(--color-background)] border-t border-[var(--color-border)] transition-colors scroll-mt-16">
       <div className="max-w-7xl mx-auto px-6">
         <MotionWrapper>
           <div className="mb-14">

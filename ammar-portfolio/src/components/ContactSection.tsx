@@ -13,7 +13,7 @@ export function ContactSection() {
   };
 
   return (
-    <footer id="contact" className="pt-28 pb-12 relative z-10 bg-[var(--color-background)] border-t border-[var(--color-border)] transition-colors">
+    <footer id="contact" className="pt-28 pb-12 relative z-10 bg-[var(--color-background)] border-t border-[var(--color-border)] transition-colors scroll-mt-16">
       <div className="max-w-4xl mx-auto px-6">
         {/* Contact CTA Block */}
         <MotionWrapper>

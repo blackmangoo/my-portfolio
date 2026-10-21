@@ -66,7 +66,7 @@ export function Navbar() {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768) setIsMobileOpen(false);
+      if (window.innerWidth >= 1024) setIsMobileOpen(false);
     };
     window.addEventListener("resize", handleResize, { passive: true });
     return () => window.removeEventListener("resize", handleResize);
@@ -76,11 +76,19 @@ export function Navbar() {
     setIsMobileOpen(false);
     if (href === "#home") {
       window.scrollTo({ top: 0, behavior: "smooth" });
+      window.history.pushState(null, "", "#home");
       return;
     }
-    const el = document.querySelector(href);
+    const targetId = href.startsWith("#") ? href.slice(1) : href;
+    const el = document.getElementById(targetId) || document.querySelector(href);
     if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
+      const navOffset = 76;
+      const elementPosition = el.getBoundingClientRect().top + window.scrollY;
+      window.scrollTo({
+        top: Math.max(0, elementPosition - navOffset),
+        behavior: "smooth",
+      });
+      window.history.pushState(null, "", href);
     }
   }, []);
 
@@ -105,7 +113,7 @@ export function Navbar() {
     >
       <nav className="max-w-7xl mx-auto px-6 py-3.5 flex items-center justify-between" aria-label="Main navigation">
         {/* Identity & Status */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 shrink-0">
           <button
             onClick={() => handleNavClick("#home")}
             className="text-base font-semibold tracking-tight text-[var(--color-foreground)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] rounded-sm min-h-[44px] flex items-center"
@@ -114,14 +122,14 @@ export function Navbar() {
             {siteConfig.shortName}
           </button>
 
-          <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono text-[var(--color-accent)] bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 rounded-full">
+          <span className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1 text-[11px] font-mono text-[var(--color-accent)] bg-[var(--color-accent)]/10 border border-[var(--color-accent)]/20 rounded-full">
             <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)] animate-pulse" />
             <span>Open to AI Roles</span>
           </span>
         </div>
 
         {/* Desktop Nav Links & Controls */}
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden lg:flex items-center gap-2 xl:gap-4 shrink-0">
           {siteConfig.navItems.map((item) => {
             const sectionId = item.href.replace("#", "");
             const isActive = activeSection === sectionId;
@@ -129,7 +137,7 @@ export function Navbar() {
               <button
                 key={item.href}
                 onClick={() => handleNavClick(item.href)}
-                className={`relative text-sm font-medium transition-colors min-h-[44px] px-2 flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] rounded-sm ${
+                className={`relative text-xs xl:text-sm font-medium transition-colors min-h-[40px] px-2 py-1 flex items-center whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] rounded-sm ${
                   isActive ? "text-[var(--color-foreground)] font-semibold" : "text-[var(--color-muted)] hover:text-[var(--color-foreground)]"
                 }`}
                 aria-current={isActive ? "true" : undefined}
@@ -151,7 +159,7 @@ export function Navbar() {
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.92 }}
             onClick={toggleTheme}
-            className="p-2.5 text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors rounded-sm min-h-[44px] min-w-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
+            className="p-2 text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors rounded-sm min-h-[40px] min-w-[40px] shrink-0 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
             aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
             title={`Toggle ${theme === "light" ? "Dark" : "Light"} Mode`}
           >
@@ -165,14 +173,14 @@ export function Navbar() {
             href={siteConfig.cvPath}
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-2 px-4 py-2.5 text-xs font-medium text-[var(--color-background)] bg-[var(--color-foreground)] hover:bg-[var(--color-accent)] transition-colors rounded-sm min-h-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-accent)]"
+            className="ml-1 xl:ml-2 px-3.5 py-2 text-xs font-semibold whitespace-nowrap shrink-0 text-[var(--color-background)] bg-[var(--color-foreground)] hover:bg-[var(--color-accent)] transition-colors rounded-sm min-h-[40px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-accent)]"
           >
             Resume (PDF)
           </motion.a>
         </div>
 
         {/* Mobile menu toggle & theme */}
-        <div className="flex items-center gap-2 md:hidden">
+        <div className="flex items-center gap-2 lg:hidden">
           <motion.button
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.92 }}
@@ -210,7 +218,7 @@ export function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="md:hidden fixed inset-0 top-[60px] bg-black/40 backdrop-blur-sm z-40"
+              className="lg:hidden fixed inset-0 top-[60px] bg-black/40 backdrop-blur-sm z-40"
               onClick={() => setIsMobileOpen(false)}
               aria-hidden="true"
             />
@@ -219,7 +227,7 @@ export function Navbar() {
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.2 }}
-              className="md:hidden relative z-50 bg-[var(--color-background)] border-b border-[var(--color-border)] overflow-hidden"
+              className="lg:hidden relative z-50 bg-[var(--color-background)] border-b border-[var(--color-border)] overflow-hidden"
             >
               <div className="px-6 py-4 flex flex-col gap-2">
                 {siteConfig.navItems.map((item) => {

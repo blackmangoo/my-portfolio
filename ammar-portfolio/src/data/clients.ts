@@ -106,7 +106,7 @@ export const clientProjects: ClientProject[] = [
       clientName: "Momin",
       clientRole: "Owner & Operator",
       companyName: "Fine Burger & Fast Food (Since 1981)",
-      location: "Baghbanpura, Lahore",
+      location: "Lahore",
       rating: 5,
       verified: true,
       date: "October 2026",

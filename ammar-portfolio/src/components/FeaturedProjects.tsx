@@ -193,7 +193,7 @@ export function FeaturedProjects() {
   const showFlagship = selectedCategory === "All" || omniDrive.category === selectedCategory;
 
   return (
-    <section id="projects" className="py-24 relative z-10 bg-[var(--color-background)] transition-colors">
+    <section id="projects" className="py-24 relative z-10 bg-[var(--color-background)] transition-colors scroll-mt-16">
       <div className="max-w-7xl mx-auto px-6">
         <MotionWrapper>
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
