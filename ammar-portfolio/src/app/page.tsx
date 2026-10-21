@@ -7,6 +7,7 @@ import { SkillsSection } from "@/components/SkillsSection";
 import { CertificationSection } from "@/components/CertificationSection";
 import { ContactSection } from "@/components/ContactSection";
 import { MotionWrapper } from "@/components/MotionWrapper";
+import { PhysicsDroplet } from "@/components/PhysicsDroplet";
 
 function AboutSection() {
   return (
@@ -46,6 +47,7 @@ export default function Home() {
       <SkillsSection />
       <CertificationSection />
       <ContactSection />
+      <PhysicsDroplet />
     </main>
   );
 }
