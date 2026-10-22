@@ -13,12 +13,22 @@ import {
   ShieldCheck,
   ArrowUpRight,
   Briefcase,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 function ClientCard({ client }: { client: ClientProject }) {
   const [activeTab, setActiveTab] = useState<number>(0);
   const isFood = client.id === "fine-burger";
+
+  const nextTab = () => {
+    setActiveTab((prev) => (prev + 1) % client.deliverables.length);
+  };
+
+  const prevTab = () => {
+    setActiveTab((prev) => (prev - 1 + client.deliverables.length) % client.deliverables.length);
+  };
 
   return (
     <div className="relative rounded-sm border border-[var(--color-border)] p-6 sm:p-10 bg-[var(--color-panel)] shadow-sm hover:border-[var(--color-accent)]/50 transition-all overflow-hidden">
@@ -30,8 +40,9 @@ function ClientCard({ client }: { client: ClientProject }) {
             <span>{client.badge}</span>
           </span>
 
-          <span className="text-xs font-mono text-[var(--color-muted)]">
-            Live in Production
+          <span className="text-xs font-mono text-[var(--color-muted)] flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <span>Live in Production</span>
           </span>
         </div>
 
@@ -41,7 +52,8 @@ function ClientCard({ client }: { client: ClientProject }) {
           href={client.liveUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-sm transition-all shadow-sm bg-[var(--color-foreground)] text-[var(--color-background)] hover:bg-[var(--color-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
+          aria-label={`Launch ${client.name} live platform`}
+          className="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-sm transition-all shadow-sm bg-[var(--color-foreground)] text-[var(--color-background)] hover:bg-[var(--color-accent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] min-h-[44px]"
         >
           <span>Launch Platform</span>
           <ArrowUpRight className="w-3.5 h-3.5" />
@@ -76,22 +88,45 @@ function ClientCard({ client }: { client: ClientProject }) {
           <div>
             <div className="flex items-center justify-between mb-3">
               <h4 className="text-xs font-semibold text-[var(--color-foreground)] uppercase tracking-wider">
-                Delivered Modules (Click to Inspect)
+                Delivered Modules
               </h4>
-              <span className="text-[11px] font-mono text-[var(--color-muted)]">
-                {activeTab + 1} of {client.deliverables.length}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-mono text-[var(--color-muted)] mr-1">
+                  {activeTab + 1} of {client.deliverables.length}
+                </span>
+                <button
+                  type="button"
+                  onClick={prevTab}
+                  aria-label="Previous module"
+                  className="p-1.5 rounded border border-[var(--color-border)] hover:border-[var(--color-accent)] text-[var(--color-muted)] hover:text-[var(--color-foreground)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] min-w-[32px] min-h-[32px] flex items-center justify-center"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={nextTab}
+                  aria-label="Next module"
+                  className="p-1.5 rounded border border-[var(--color-border)] hover:border-[var(--color-accent)] text-[var(--color-muted)] hover:text-[var(--color-foreground)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] min-w-[32px] min-h-[32px] flex items-center justify-center"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
 
-            {/* Step Pills */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
+            {/* Step Pills with proper tab semantics */}
+            <div role="tablist" aria-label={`${client.name} modules`} className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
               {client.deliverables.map((deliv, idx) => {
                 const isActive = activeTab === idx;
                 return (
                   <button
                     key={deliv.title}
+                    role="tab"
+                    id={`tab-${client.id}-${idx}`}
+                    aria-selected={isActive}
+                    aria-controls={`panel-${client.id}-${idx}`}
+                    tabIndex={isActive ? 0 : -1}
                     onClick={() => setActiveTab(idx)}
-                    className={`relative p-3 text-left rounded-sm border text-xs transition-all min-h-[58px] flex flex-col justify-between ${
+                    className={`relative p-3 text-left rounded-sm border text-xs transition-all min-h-[58px] flex flex-col justify-between focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] ${
                       isActive
                         ? "border-[var(--color-accent)] bg-[var(--color-background)] shadow-sm"
                         : "border-[var(--color-border)] bg-[var(--color-background)]/60 hover:border-[var(--color-foreground)]/30 text-[var(--color-muted)]"
@@ -119,6 +154,9 @@ function ClientCard({ client }: { client: ClientProject }) {
             <AnimatePresence mode="wait">
               <motion.div
                 key={client.deliverables[activeTab].title}
+                role="tabpanel"
+                id={`panel-${client.id}-${activeTab}`}
+                aria-labelledby={`tab-${client.id}-${activeTab}`}
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
@@ -135,7 +173,7 @@ function ClientCard({ client }: { client: ClientProject }) {
                       href={client.deliverables[activeTab].url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[11px] font-mono text-[var(--color-accent)] hover:underline inline-flex items-center gap-1"
+                      className="text-[11px] font-mono text-[var(--color-accent)] hover:underline inline-flex items-center gap-1 min-h-[32px] items-center"
                     >
                       <span>Direct Portal Link</span>
                       <ExternalLink className="w-3 h-3" />
@@ -164,7 +202,7 @@ function ClientCard({ client }: { client: ClientProject }) {
             ))}
           </div>
 
-          {/* Verified Owner Review Card */}
+          {/* Verified Client Review Card - Rendered cleanly without repetition */}
           <div className="relative rounded-sm border border-[var(--color-border)] p-6 bg-[var(--color-background)] shadow-sm transition-all">
             {/* Review Card Header */}
             <div className="flex items-start justify-between gap-3 mb-4">
@@ -179,7 +217,7 @@ function ClientCard({ client }: { client: ClientProject }) {
                   ))}
                 </div>
                 <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-[var(--color-muted)]">
-                  Client Feedback
+                  Client Review
                 </span>
               </div>
 
@@ -189,13 +227,8 @@ function ClientCard({ client }: { client: ClientProject }) {
               </span>
             </div>
 
-            {/* Highlighted Quote Header */}
-            <p className="text-sm font-semibold text-[var(--color-foreground)] italic mb-3 leading-snug">
-              &ldquo;{client.review.highlightText}&rdquo;
-            </p>
-
-            {/* Full Quote */}
-            <blockquote className="text-xs text-[var(--color-muted)] leading-relaxed mb-5">
+            {/* Quote Body */}
+            <blockquote className="text-xs text-[var(--color-foreground)]/90 leading-relaxed mb-5 italic border-l-2 border-[var(--color-accent)] pl-3">
               &ldquo;{client.review.text}&rdquo;
             </blockquote>
 
@@ -211,6 +244,7 @@ function ClientCard({ client }: { client: ClientProject }) {
                 <div className="text-[10px] text-[var(--color-muted)]">
                   {client.review.companyName}
                   {client.review.location ? ` • ${client.review.location}` : ""}
+                  {/* TODO(ammar): add client LinkedIn URL if available */}
                 </div>
               </div>
               <span className="text-[10px] font-mono text-[var(--color-muted)]">{client.review.date}</span>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo, Suspense } from "react";
+import { useRef, useMemo, useState, useEffect, Suspense } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
@@ -53,7 +53,23 @@ const FACE_FRAGMENT_SHADER = `
 function FacePointCloud() {
   const pointsRef = useRef<THREE.Points>(null);
   const materialRef = useRef<THREE.ShaderMaterial>(null);
+  const isVisibleRef = useRef<boolean>(true);
   const { scene } = useGLTF("/face-standard.glb");
+
+  useEffect(() => {
+    const handleScroll = () => {
+      isVisibleRef.current = window.scrollY < 850 && !document.hidden;
+    };
+    const handleVisibility = () => {
+      isVisibleRef.current = window.scrollY < 850 && !document.hidden;
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
+  }, []);
 
   const geometry = useMemo(() => {
     let meshGeo: THREE.BufferGeometry | null = null;
@@ -80,6 +96,7 @@ function FacePointCloud() {
   }, []);
 
   useFrame((state, delta) => {
+    if (!isVisibleRef.current) return;
     const t = state.clock.elapsedTime;
 
     // 1. Update shader uniforms for biometric scan wave and organic respiration
@@ -141,6 +158,45 @@ function FacePointCloud() {
 // ─── Focused 3D Face Showcase ───────────────────────────────────────────────
 
 export function HeroCanvas() {
+  const [hasWebGL] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    try {
+      const canvas = document.createElement("canvas");
+      return Boolean(
+        window.WebGLRenderingContext &&
+          (canvas.getContext("webgl") || canvas.getContext("experimental-webgl"))
+      );
+    } catch {
+      return false;
+    }
+  });
+
+  if (!hasWebGL) {
+    return (
+      <div className="relative w-full h-[380px] sm:h-[480px] lg:h-[600px] flex items-center justify-center">
+        {/* Static Biometric Visual Fallback when WebGL is disabled or unsupported */}
+        <div className="relative w-72 h-72 sm:w-80 sm:h-80 rounded-full border border-[var(--color-accent)]/20 flex items-center justify-center bg-[var(--color-panel)] shadow-sm">
+          <svg
+            viewBox="0 0 100 100"
+            className="w-48 h-48 text-[var(--color-accent)] opacity-60"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="0.8"
+          >
+            <circle cx="50" cy="50" r="42" strokeDasharray="3 3" />
+            <circle cx="50" cy="50" r="32" />
+            <path d="M 50 20 L 50 80 M 20 50 L 80 50" strokeOpacity="0.4" />
+            <circle cx="50" cy="42" r="3" fill="currentColor" />
+            <circle cx="38" cy="46" r="2" fill="currentColor" />
+            <circle cx="62" cy="46" r="2" fill="currentColor" />
+            <circle cx="50" cy="62" r="2" fill="currentColor" />
+            <path d="M 36 68 Q 50 76 64 68" strokeWidth="1.2" />
+          </svg>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="relative w-full h-[380px] sm:h-[480px] lg:h-[600px] flex items-center justify-center pointer-events-none lg:pointer-events-auto">
       <div className="w-full h-full relative cursor-default touch-pan-y">

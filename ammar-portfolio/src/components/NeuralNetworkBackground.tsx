@@ -25,6 +25,7 @@ function NetworkScene() {
   const groupRef = useRef<THREE.Group>(null);
   const scrollRef = useRef<number>(0);
   const scrollSpeedRef = useRef<number>(1.0);
+  const isVisibleRef = useRef<boolean>(true);
 
   useEffect(() => {
     let lastY = window.scrollY;
@@ -33,14 +34,22 @@ function NetworkScene() {
       const delta = Math.abs(currentY - lastY);
       lastY = currentY;
 
-      // Track scroll progress (0 to 1 over first 800px)
+      // Pause rendering calculations when hero is scrolled out of view
+      isVisibleRef.current = currentY < 850 && !document.hidden;
       scrollRef.current = Math.min(1.0, currentY / 700);
-      // Kinetic acceleration of signal pulses during scroll
       scrollSpeedRef.current = Math.min(3.8, 1.0 + delta * 0.06);
     };
 
+    const handleVisibility = () => {
+      isVisibleRef.current = window.scrollY < 850 && !document.hidden;
+    };
+
     window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, []);
 
   // Generate wide feedforward neural network geometry
@@ -110,6 +119,7 @@ function NetworkScene() {
   );
 
   useFrame((state, delta) => {
+    if (!isVisibleRef.current) return;
     const pulses = pulsesRef.current;
     const posAttr = pulseGeometry.getAttribute("position") as THREE.BufferAttribute;
     const array = posAttr.array as Float32Array;

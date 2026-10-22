@@ -1,8 +1,8 @@
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/Hero";
 import { FeaturedProjects } from "@/components/FeaturedProjects";
-import { ClientDeliveriesSection } from "@/components/ClientDeliveriesSection";
 import { ExperienceTimeline } from "@/components/ExperienceTimeline";
+import { ClientDeliveriesSection } from "@/components/ClientDeliveriesSection";
 import { SkillsSection } from "@/components/SkillsSection";
 import { CertificationSection } from "@/components/CertificationSection";
 import { ContactSection } from "@/components/ContactSection";
@@ -23,10 +23,10 @@ function AboutSection() {
 
           <div className="text-base sm:text-lg text-[var(--color-foreground)]/90 leading-relaxed space-y-6">
             <p>
-              I am a BS Artificial Intelligence graduate from FAST-NUCES with a deep commitment to practical, deployable AI engineering. While training models in Jupyter notebooks is foundational, true engineering begins when that model must interact with raw, noisy physical signals, high-throughput microservices, and human operators.
+              I am an AI/ML Engineer and BS Artificial Intelligence graduate from FAST-NUCES specializing in LLM orchestration, Retrieval-Augmented Generation (RAG), and applied NLP. I build context-aware AI systems with deterministic safety controls—from 4-bit LoRA/QLoRA fine-tuning and dense vector retrieval to low-latency deployment with FastAPI and Supabase.
             </p>
             <p>
-              My work spans from edge computer vision (YOLOv11 custom architectures) and mathematical sensor fusion (Kalman filters) to autonomous agent orchestration and retrieval-augmented assistance. I believe in engineering complete feedback loops: from data curation and fine-tuning (LoRA/PEFT) to containerized inference pipelines with sub-100ms latency guarantees.
+              Alongside language models, my foundation covers edge computer vision (YOLO11), physical dynamics sensor fusion (Kalman filters), and full-stack product delivery with Next.js and Flutter. Rather than building fragile notebook prototypes, I engineer end-to-end production systems where inference latency, throughput, and retrieval relevance are empirically verified.
             </p>
           </div>
         </MotionWrapper>
@@ -41,10 +41,10 @@ export default function Home() {
       <Navbar />
       <Hero />
       <FeaturedProjects />
-      <ClientDeliveriesSection />
       <ExperienceTimeline />
-      <AboutSection />
+      <ClientDeliveriesSection />
       <SkillsSection />
+      <AboutSection />
       <CertificationSection />
       <ContactSection />
       <PhysicsDroplet />

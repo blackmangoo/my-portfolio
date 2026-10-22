@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Activity, Cpu, Database, Eye, Smartphone, Zap, Play, Pause } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Activity, Cpu, Database, Eye, Smartphone, Zap, Play, Pause, Copy, Check } from "lucide-react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 
 interface PipelineStep {
   id: string;
   name: string;
   category: string;
-  latency: string;
+  latencyNote: string;
   icon: React.ComponentType<{ className?: string }>;
   tensorInput: string;
   tensorOutput: string;
@@ -21,76 +21,157 @@ const pipelineSteps: PipelineStep[] = [
     id: "telemetry",
     name: "OBD-II Ingestion",
     category: "Signal Acquisition",
-    latency: "< 5ms",
+    latencyNote: "Illustrative Flow",
     icon: Activity,
     tensorInput: "CAN-bus PID hex stream @ 20Hz",
     tensorOutput: "Vector [RPM, Speed, Throttle, CoolantTemp]",
-    description: "Queries high-frequency vehicle telemetry over standard ELM327 / STN1110 protocol.",
-    codeSnippet: `async def read_obd_stream(port: str):\n    connection = obd.Async(port)\n    connection.watch(obd.commands.SPEED, callback=on_speed)\n    connection.watch(obd.commands.RPM, callback=on_rpm)\n    connection.start()\n    return connection`,
+    description: "Queries vehicle telemetry over standard ELM327 / STN1110 protocol, ingesting speed and acceleration streams.",
+    codeSnippet: `async def read_obd_stream(port: str):
+    connection = obd.Async(port)
+    connection.watch(obd.commands.SPEED, callback=on_speed)
+    connection.watch(obd.commands.RPM, callback=on_rpm)
+    connection.start()
+    return connection`,
   },
   {
     id: "kalman",
     name: "1D Kalman Filter",
     category: "Sensor Fusion & Denoising",
-    latency: "< 1ms",
+    latencyNote: "< 1ms Compute",
     icon: Zap,
     tensorInput: "Scalar z_k (Noisy raw velocity/accel)",
     tensorOutput: "Scalar x_hat_k (Optimal minimum variance estimate)",
-    description: "Recursively denoises sensor noise and removes accelerometer drift using predictive covariance updates.",
-    codeSnippet: `class KalmanFilter1D:\n    def __init__(self, q=1e-4, r=1e-2):\n        self.q, self.r = q, r  # Process & Measurement variance\n        self.x, self.p = 0.0, 1.0\n    \n    def update(self, z: float) -> float:\n        # Predict & Correct cycle\n        self.p += self.q\n        k = self.p / (self.p + self.r)  # Kalman Gain\n        self.x += k * (z - self.x)\n        self.p *= (1.0 - k)\n        return self.x`,
+    description: "Recursively denoises sensor noise and suppresses accelerometer drift using predictive covariance updates.",
+    codeSnippet: `class KalmanFilter1D:
+    def __init__(self, q=1e-4, r=1e-2):
+        self.q, self.r = q, r  # Process & Measurement variance
+        self.x, self.p = 0.0, 1.0
+
+    def update(self, z: float) -> float:
+        # Predict & Correct cycle
+        self.p += self.q
+        k = self.p / (self.p + self.r)  # Kalman Gain
+        self.x += k * (z - self.x)
+        self.p *= (1.0 - k)
+        return self.x`,
   },
   {
     id: "gateway",
     name: "FastAPI Gateway",
     category: "Async Routing",
-    latency: "12ms (p95)",
+    latencyNote: "Async Serving",
     icon: Cpu,
-    tensorInput: "JSON Payload with compressed sensor frames",
-    tensorOutput: "Asynchronous task queue & WebSocket dispatch",
-    description: "High-throughput asynchronous ASGI microservice routing multi-modal frames to ML inference workers.",
-    codeSnippet: `@app.post("/api/v1/telemetry/frame")\nasync def ingest_frame(payload: TelemetryFrameSchema):\n    filtered_speed = kalman_tracker.update(payload.speed)\n    anomaly = anomaly_detector.predict([[payload.rpm, filtered_speed]])\n    return {"status": "ok", "denoised_speed": filtered_speed, "anomaly": bool(anomaly)}`,
+    tensorInput: "Multipart image payload + telemetry frame",
+    tensorOutput: "Asynchronous task queue & JSON response",
+    description: "High-throughput asynchronous ASGI microservice routing multi-modal frames to CPU-clamped inference workers.",
+    codeSnippet: `@app.post("/predict")
+async def predict_car_part(file: UploadFile = File(...)):
+    model = get_yolo_model()
+    image = Image.open(io.BytesIO(await file.read()))
+    predictions, inference_time = await asyncio.to_thread(
+        _sync_yolo_inference, model, image
+    )
+    return {"success": True, "predictions": predictions, "latency_ms": inference_time}`,
   },
   {
     id: "vision",
-    name: "YOLOv11 Tensor Core",
+    name: "YOLO11-Large Core",
     category: "Edge Vision Perception",
-    latency: "92ms",
+    latencyNote: "~90–110 ms (CPU)",
     icon: Eye,
-    tensorInput: "Image Tensor: [1, 3, 640, 640] normalized RGB",
-    tensorOutput: "Tensor [N, 6]: [x1, y1, x2, y2, confidence, class_id]",
-    description: "Custom fine-tuned YOLO11-Large model identifying 50 distinct mechanical failure states and road obstacles.",
-    codeSnippet: `model = YOLO("weights/omni_yolo11l_best.pt")\nresults = model.predict(\n    source=frame_buffer,\n    imgsz=640,\n    conf=0.45,\n    device="cuda:0" if torch.cuda.is_available() else "cpu",\n    verbose=False\n)`,
+    tensorInput: "Image Tensor: [1, 3, 224, 224] normalized RGB",
+    tensorOutput: "Top-5 Predicted Classes with Confidence Scores",
+    description: "Custom fine-tuned YOLO11-Large champion model recognizing 50 automotive mechanical component and failure classes.",
+    codeSnippet: `model = YOLO("models/car_parts_large_v1.pt")
+with torch.inference_mode():
+    results = model.predict(source=image, imgsz=224, verbose=False)
+result = results[0]
+predictions = [
+    {"class": result.names[idx], "confidence": float(conf) * 100}
+    for idx, conf in zip(result.probs.top5, result.probs.top5conf)
+]`,
   },
   {
     id: "rag",
     name: "pgvector RAG",
     category: "Semantic Retrieval",
-    latency: "18ms",
+    latencyNote: "Vector Cosine Search",
     icon: Database,
     tensorInput: "Diagnostic Trouble Code (DTC) + Text Query",
     tensorOutput: "Top-k grounded technical repair manuals",
-    description: "Retrieves OEM maintenance procedures via HNSW index similarity search for instant DIY repair instructions.",
-    codeSnippet: `SELECT manual_id, content, 1 - (embedding <=> query_vec) AS similarity\nFROM automotive_service_bulletins\nWHERE dtc_code = 'P0300'\nORDER BY embedding <=> query_vec\nLIMIT 3;`,
+    description: "Retrieves OEM maintenance procedures via Supabase match_documents RPC for verified mechanical repair workflows.",
+    codeSnippet: `-- Supabase pgvector cosine similarity search
+SELECT id, title, content, 1 - (embedding <=> query_vec) AS similarity
+FROM automotive_technical_bulletins
+WHERE 1 - (embedding <=> query_vec) > 0.70
+ORDER BY embedding <=> query_vec
+LIMIT 3;`,
   },
   {
     id: "client",
     name: "Flutter HUD",
     category: "Client Telemetry UI",
-    latency: "60 FPS",
+    latencyNote: "Clean Arch + Riverpod",
     icon: Smartphone,
     tensorInput: "Streamed WebSocket State DTO",
     tensorOutput: "Real-time interactive HUD display",
-    description: "Low-overhead cross-platform mobile client displaying live sensor dials, DTC alerts, and repair steps.",
-    codeSnippet: `StreamBuilder<TelemetryState>(\n  stream: telemetryBloc.stream,\n  builder: (context, snapshot) {\n    return SpeedometerWidget(velocity: snapshot.data?.filteredVelocity ?? 0.0);\n  },\n)`,
+    description: "Cross-platform mobile client displaying live sensor dials, DTC alerts, and sub-sample milestone timing.",
+    codeSnippet: `StreamBuilder<TelemetryState>(
+  stream: telemetryBloc.stream,
+  builder: (context, snapshot) {
+    return SpeedometerWidget(velocity: snapshot.data?.filteredVelocity ?? 0.0);
+  },
+)`,
   },
 ];
 
 export function OmniDriveExplorer() {
   const [selectedStep, setSelectedStep] = useState<string>("kalman");
   const [isRunning, setIsRunning] = useState(true);
+  const [isCopied, setIsCopied] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const shouldReduceMotion = useReducedMotion();
 
   const activeStep = pipelineSteps.find((s) => s.id === selectedStep) || pipelineSteps[1];
+
+  // Pause simulation when off-screen or when tab is hidden
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(el);
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        setIsVisible(false);
+      } else if (el) {
+        const rect = el.getBoundingClientRect();
+        setIsVisible(rect.top < window.innerHeight && rect.bottom > 0);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
+
+  // Copy code snippet helper
+  const handleCopy = () => {
+    navigator.clipboard.writeText(activeStep.codeSnippet);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
 
   // Kalman Filter Simulation on HTML5 Canvas
   useEffect(() => {
@@ -107,30 +188,26 @@ export function OmniDriveExplorer() {
     let currentTrueSpeed = 60;
     let kalmanState = 60;
     let kalmanCov = 1.0;
-    const Q = 0.02; // Process variance (true vehicle acceleration)
-    const R = 18.0; // Measurement variance (sensor noise)
+    const Q = 0.02; // Process variance
+    const R = 18.0; // Measurement variance
 
     let frameCount = 0;
-    const updateEveryNFrames = 3; // Throttles updates to ~20Hz (matching OBD-II sample rate)
+    const updateEveryNFrames = 3;
 
     const render = () => {
-      if (isRunning) {
+      if (isRunning && isVisible && !shouldReduceMotion) {
         frameCount++;
 
         if (frameCount % updateEveryNFrames === 0) {
-          // Slow organic true vehicle velocity wander
           currentTrueSpeed += (Math.random() - 0.5) * 0.9;
           currentTrueSpeed = Math.max(35, Math.min(85, currentTrueSpeed));
 
-          // Substantially amplified raw sensor jitter with realistic spikes
           let noise = (Math.random() - 0.5) * 24.0;
           if (Math.random() > 0.78) {
-            // Occasional accelerometer road bump / CAN-bus electrical glitch
             noise += (Math.random() - 0.5) * 16.0;
           }
           const noisyMeasurement = currentTrueSpeed + noise;
 
-          // 1D Kalman Predict & Update cycle
           kalmanCov += Q;
           const K = kalmanCov / (kalmanCov + R);
           kalmanState += K * (noisyMeasurement - kalmanState);
@@ -159,19 +236,17 @@ export function OmniDriveExplorer() {
         ctx.stroke();
       }
 
-      // Dynamic coordinate mapping with safety headroom
       const minY = 10;
       const maxY = 110;
       const getY = (val: number) => height - ((val - minY) / (maxY - minY)) * height;
       const stepX = width / (historyLength - 1);
 
-      // 1. Draw Raw Noisy Sensor Line (High-contrast dashed orange with visible jitter)
+      // 1. Draw Raw Noisy Sensor Line
       if (rawHistory.length > 1) {
         ctx.beginPath();
         ctx.setLineDash([4, 3]);
         ctx.strokeStyle = "rgba(249, 115, 22, 0.75)";
         ctx.lineWidth = 1.8;
-        ctx.shadowBlur = 0;
         for (let i = 0; i < rawHistory.length; i++) {
           const x = i * stepX;
           const y = getY(rawHistory[i]);
@@ -180,7 +255,6 @@ export function OmniDriveExplorer() {
         }
         ctx.stroke();
 
-        // Draw small indicator dots on recent noisy spikes
         ctx.fillStyle = "rgba(249, 115, 22, 0.6)";
         for (let i = Math.max(0, rawHistory.length - 25); i < rawHistory.length; i += 2) {
           const x = i * stepX;
@@ -191,7 +265,7 @@ export function OmniDriveExplorer() {
         }
       }
 
-      // 2. Draw Kalman Smoothed Output (Vibrant glowing solid emerald green)
+      // 2. Draw Kalman Smoothed Output
       if (kalmanHistory.length > 1) {
         ctx.beginPath();
         ctx.setLineDash([]);
@@ -206,7 +280,7 @@ export function OmniDriveExplorer() {
           else ctx.lineTo(x, y);
         }
         ctx.stroke();
-        ctx.shadowBlur = 0; // Reset shadow for next render pass
+        ctx.shadowBlur = 0;
       }
 
       animationFrameId = requestAnimationFrame(render);
@@ -214,10 +288,10 @@ export function OmniDriveExplorer() {
 
     render();
     return () => cancelAnimationFrame(animationFrameId);
-  }, [isRunning]);
+  }, [isRunning, isVisible, shouldReduceMotion]);
 
   return (
-    <div className="w-full bg-[var(--color-panel)] border border-[var(--color-border)] rounded-sm p-6 sm:p-8 mt-6">
+    <div ref={containerRef} className="w-full bg-[var(--color-panel)] border border-[var(--color-border)] rounded-sm p-6 sm:p-8 mt-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[var(--color-border)] mb-6">
         <div>
           <span className="text-xs font-mono uppercase tracking-wider text-[var(--color-accent)] font-semibold">
@@ -229,16 +303,18 @@ export function OmniDriveExplorer() {
         </div>
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={() => setIsRunning(!isRunning)}
-            className="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-medium border border-[var(--color-border)] rounded-sm hover:border-[var(--color-accent)] transition-colors min-h-[36px]"
+            aria-pressed={!isRunning}
+            className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-medium border border-[var(--color-border)] rounded-sm hover:border-[var(--color-accent)] text-[var(--color-foreground)] transition-colors min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
           >
-            {isRunning ? <Pause className="w-3.5 h-3.5 text-amber-500" /> : <Play className="w-3.5 h-3.5 text-emerald-500" />}
+            {isRunning ? <Pause className="w-4 h-4 text-amber-500" /> : <Play className="w-4 h-4 text-emerald-500" />}
             <span>{isRunning ? "Pause Telemetry" : "Resume Stream"}</span>
           </button>
         </div>
       </div>
 
-      {/* Pipeline Navigation Horizontal Steps with Framer Motion Layout Springs */}
+      {/* Pipeline Navigation Horizontal Steps */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 mb-8">
         {pipelineSteps.map((step) => {
           const Icon = step.icon;
@@ -249,7 +325,7 @@ export function OmniDriveExplorer() {
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setSelectedStep(step.id)}
-              className={`relative p-3 rounded-sm text-left transition-colors border flex flex-col justify-between min-h-[85px] z-10 ${
+              className={`relative p-3 rounded-sm text-left transition-colors border flex flex-col justify-between min-h-[85px] z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] ${
                 isSelected
                   ? "border-[var(--color-accent)] shadow-sm"
                   : "bg-[var(--color-background)] border-[var(--color-border)] hover:border-[var(--color-foreground)]/30"
@@ -264,7 +340,7 @@ export function OmniDriveExplorer() {
               )}
               <div className="flex items-center justify-between w-full">
                 <Icon className={`w-4 h-4 ${isSelected ? "text-[var(--color-accent)]" : "text-[var(--color-muted)]"}`} />
-                <span className="text-[10px] font-mono text-[var(--color-accent)] font-medium">{step.latency}</span>
+                <span className="text-[10px] font-mono text-[var(--color-accent)] font-medium">{step.latencyNote}</span>
               </div>
               <div className="mt-2">
                 <div className={`text-xs font-semibold ${isSelected ? "text-[var(--color-foreground)]" : "text-[var(--color-muted)]"}`}>
@@ -277,7 +353,7 @@ export function OmniDriveExplorer() {
         })}
       </div>
 
-      {/* Deep Dive Panel with AnimatePresence */}
+      {/* Deep Dive Panel */}
       <AnimatePresence mode="wait">
         <motion.div
           key={activeStep.id}
@@ -325,13 +401,30 @@ export function OmniDriveExplorer() {
             </p>
           </div>
 
-          {/* Right: Real Implementation Code Snippet (5 cols) */}
+          {/* Right: Code Snippet with Copy Button */}
           <div className="lg:col-span-5 flex flex-col">
             <div className="flex items-center justify-between px-4 py-2 bg-[#1A1A1A] text-white/80 rounded-t-sm text-xs font-mono border-b border-white/10">
               <span>{activeStep.id}.py</span>
-              <span className="text-[10px] text-emerald-400 font-medium">Production Verified</span>
+              <button
+                type="button"
+                onClick={handleCopy}
+                aria-label="Copy code snippet to clipboard"
+                className="flex items-center gap-1 text-[11px] text-white/70 hover:text-white transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[var(--color-accent)] p-1 rounded"
+              >
+                {isCopied ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                    <span className="text-emerald-400">Copied</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>Copy</span>
+                  </>
+                )}
+              </button>
             </div>
-            <pre className="p-4 bg-[#141414] text-emerald-200/90 font-mono text-xs overflow-x-auto rounded-b-sm leading-relaxed max-h-[260px]">
+            <pre className="p-4 bg-[#141414] text-emerald-200/90 font-mono text-xs overflow-x-auto rounded-b-sm leading-relaxed max-h-[260px] scrollbar-thin">
               <code>{activeStep.codeSnippet}</code>
             </pre>
           </div>

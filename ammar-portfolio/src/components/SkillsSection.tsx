@@ -26,7 +26,7 @@ export function SkillsSection() {
               Technical Toolkit
             </h2>
             <p className="text-sm text-[var(--color-muted)]">
-              Core frameworks and technologies used across machine learning research, inference backends, and frontend delivery.
+              Core frameworks and technologies used across machine learning research, inference backends, and full-stack delivery. Highlighted badges indicate core production competencies.
             </p>
           </div>
         </MotionWrapper>
@@ -46,18 +46,29 @@ export function SkillsSection() {
                   </h3>
                 </div>
 
-                <ul className="grid grid-cols-2 gap-y-2.5 gap-x-4">
-                  {group.skills.map((skill) => (
-                    <motion.li
-                      key={skill}
-                      whileHover={{ x: 3 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                      className="text-xs font-mono text-[var(--color-foreground)]/80 flex items-center gap-1.5 cursor-default"
-                    >
-                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-accent)]/60" />
-                      <span>{skill}</span>
-                    </motion.li>
-                  ))}
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-y-2.5 gap-x-3">
+                  {group.skills.map((skill) => {
+                    const isPrimary = group.primarySkills?.includes(skill);
+                    return (
+                      <motion.li
+                        key={skill}
+                        whileHover={{ x: 3 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 20 }}
+                        className={`text-xs font-mono flex items-center gap-2 cursor-default py-1 px-1.5 rounded ${
+                          isPrimary
+                            ? "text-[var(--color-foreground)] font-semibold bg-[var(--color-accent)]/8 border border-[var(--color-accent)]/20"
+                            : "text-[var(--color-muted)] hover:text-[var(--color-foreground)]"
+                        }`}
+                      >
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full shrink-0 ${
+                            isPrimary ? "bg-[var(--color-accent)]" : "bg-[var(--color-muted)]/40"
+                          }`}
+                        />
+                        <span className="truncate">{skill}</span>
+                      </motion.li>
+                    );
+                  })}
                 </ul>
               </motion.div>
             </MotionWrapper>

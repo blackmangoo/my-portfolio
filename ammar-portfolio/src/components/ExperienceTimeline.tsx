@@ -34,7 +34,7 @@ export function ExperienceTimeline() {
                 <div className="md:w-1/4 shrink-0 flex items-center md:justify-end gap-3 text-xs font-mono text-[var(--color-muted)]">
                   <span>{exp.dates}</span>
                   <div className="w-6 h-6 rounded-full bg-[var(--color-background)] border border-[var(--color-border)] hidden md:flex items-center justify-center text-[var(--color-accent)] z-10">
-                    {exp.type === "teaching" ? (
+                    {exp.type === "teaching" || exp.type === "education" ? (
                       <GraduationCap className="w-3.5 h-3.5" />
                     ) : (
                       <Briefcase className="w-3.5 h-3.5" />

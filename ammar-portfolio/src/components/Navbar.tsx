@@ -95,12 +95,17 @@ export function Navbar() {
   useEffect(() => {
     if (isMobileOpen) {
       document.body.style.overflow = "hidden";
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") setIsMobileOpen(false);
+      };
+      window.addEventListener("keydown", handleKeyDown);
+      return () => {
+        document.body.style.overflow = "";
+        window.removeEventListener("keydown", handleKeyDown);
+      };
     } else {
       document.body.style.overflow = "";
     }
-    return () => {
-      document.body.style.overflow = "";
-    };
   }, [isMobileOpen]);
 
   return (
@@ -136,7 +141,7 @@ export function Navbar() {
               <button
                 key={item.href}
                 onClick={() => handleNavClick(item.href)}
-                className={`relative text-xs xl:text-sm font-medium transition-colors min-h-[40px] px-2 py-1 flex items-center whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] rounded-sm ${
+                className={`relative text-xs xl:text-sm font-medium transition-colors min-h-[44px] px-2.5 py-1.5 flex items-center whitespace-nowrap focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)] rounded-sm ${
                   isActive ? "text-[var(--color-foreground)] font-semibold" : "text-[var(--color-muted)] hover:text-[var(--color-foreground)]"
                 }`}
                 aria-current={isActive ? "true" : undefined}
@@ -158,7 +163,7 @@ export function Navbar() {
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.92 }}
             onClick={toggleTheme}
-            className="p-2 text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors rounded-sm min-h-[40px] min-w-[40px] shrink-0 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
+            className="p-2.5 text-[var(--color-muted)] hover:text-[var(--color-foreground)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors rounded-sm min-h-[44px] min-w-[44px] shrink-0 flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent)]"
             aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
             title={`Toggle ${theme === "light" ? "Dark" : "Light"} Mode`}
           >
@@ -172,7 +177,8 @@ export function Navbar() {
             href={siteConfig.cvPath}
             target="_blank"
             rel="noopener noreferrer"
-            className="ml-1 xl:ml-2 px-3.5 py-2 text-xs font-semibold whitespace-nowrap shrink-0 text-[var(--color-background)] bg-[var(--color-foreground)] hover:bg-[var(--color-accent)] transition-colors rounded-sm min-h-[40px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-accent)]"
+            aria-label="Download Ammar Akbar CV (PDF, updated Oct 2026)"
+            className="ml-1 xl:ml-2 px-3.5 py-2 text-xs font-semibold whitespace-nowrap shrink-0 text-[var(--color-background)] bg-[var(--color-foreground)] hover:bg-[var(--color-accent)] transition-colors rounded-sm min-h-[44px] flex items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-accent)]"
           >
             Resume (PDF)
           </motion.a>

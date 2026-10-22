@@ -2,7 +2,7 @@
 
 import { siteConfig } from "@/data/site";
 import { MotionWrapper } from "./MotionWrapper";
-import { ArrowUp, Mail, Linkedin, Github, Phone, MapPin } from "lucide-react";
+import { ArrowUp, Mail, Linkedin, Github, MapPin, Globe } from "lucide-react";
 import { motion } from "framer-motion";
 
 export function ContactSection() {
@@ -25,48 +25,59 @@ export function ContactSection() {
               Have an applied AI challenge worth building?
             </h2>
             <p className="text-base sm:text-lg text-[var(--color-muted)] mb-8 max-w-2xl leading-relaxed">
-              I am currently open to full-time AI/ML Engineering, Computer Vision, and Full-Stack AI Developer opportunities. If you value engineers who focus on deployable, low-latency production systems rather than just static notebooks, let&apos;s talk.
+              I am currently open to full-time AI/ML Engineering, LLM/RAG, and Full-Stack AI Developer opportunities. Open to remote and onsite roles.
             </p>
 
             {/* Quick Info Grid */}
-            <div className="flex flex-wrap gap-6 mb-10 text-xs text-[var(--color-muted)] font-mono">
-              <motion.div
-                whileHover={{ scale: 1.04 }}
-                className="flex items-center gap-2 p-2 rounded bg-[var(--color-panel)] border border-[var(--color-border)] cursor-default"
-              >
+            <div className="flex flex-wrap gap-4 mb-8 text-xs text-[var(--color-muted)] font-mono">
+              <div className="flex items-center gap-2 px-3 py-2 rounded bg-[var(--color-panel)] border border-[var(--color-border)]">
                 <MapPin className="w-4 h-4 text-[var(--color-accent)]" />
                 <span>Lahore, Pakistan (PKT, UTC+5)</span>
-              </motion.div>
-              <motion.div
-                whileHover={{ scale: 1.04 }}
-                className="flex items-center gap-2 p-2 rounded bg-[var(--color-panel)] border border-[var(--color-border)] cursor-default"
-              >
-                <Phone className="w-4 h-4 text-[var(--color-accent)]" />
-                <span>{siteConfig.phone}</span>
-              </motion.div>
+              </div>
+              <div className="flex items-center gap-2 px-3 py-2 rounded bg-[var(--color-panel)] border border-[var(--color-border)]">
+                <Globe className="w-4 h-4 text-[var(--color-accent)]" />
+                <span>Open to Remote & Onsite Roles</span>
+                {/* TODO(ammar): add specific relocation cities or visa sponsorship preferences if desired */}
+              </div>
             </div>
 
-            {/* Primary Action Buttons */}
-            <div className="flex flex-wrap gap-4">
+            {/* Primary Action Buttons & Visible Email */}
+            <div className="flex flex-wrap items-center gap-4">
               <motion.a
                 whileHover={{ scale: 1.03, y: -2 }}
                 whileTap={{ scale: 0.97 }}
                 href={`mailto:${siteConfig.email}`}
+                aria-label={`Send email to ${siteConfig.email}`}
                 className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[var(--color-foreground)] text-[var(--color-background)] text-sm font-medium hover:bg-[var(--color-accent)] transition-colors rounded-sm min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-accent)]"
               >
                 <Mail className="w-4 h-4" />
-                <span>Send an Email</span>
+                <span>{siteConfig.email}</span>
               </motion.a>
+
               <motion.a
                 whileHover={{ scale: 1.03, y: -2 }}
                 whileTap={{ scale: 0.97 }}
                 href={siteConfig.linkedin}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
+                aria-label="Connect with Ammar Akbar on LinkedIn"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[var(--color-panel)] text-[var(--color-foreground)] border border-[var(--color-border)] text-sm font-medium hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors rounded-sm min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-accent)]"
               >
                 <Linkedin className="w-4 h-4" />
-                <span>Connect on LinkedIn</span>
+                <span>LinkedIn</span>
+              </motion.a>
+
+              <motion.a
+                whileHover={{ scale: 1.03, y: -2 }}
+                whileTap={{ scale: 0.97 }}
+                href={siteConfig.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Visit Ammar Akbar GitHub profile"
+                className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[var(--color-panel)] text-[var(--color-foreground)] border border-[var(--color-border)] text-sm font-medium hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors rounded-sm min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[var(--color-accent)]"
+              >
+                <Github className="w-4 h-4" />
+                <span>GitHub</span>
               </motion.a>
             </div>
           </div>
@@ -75,7 +86,7 @@ export function ContactSection() {
         {/* Footer Bottom Bar */}
         <div className="pt-8 border-t border-[var(--color-border)] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--color-muted)]">
           <div>
-            © {currentYear} {siteConfig.name}. Designed & Engineered with Next.js & Three.js.
+            © {currentYear} Ammar Akbar. All rights reserved.
           </div>
 
           <div className="flex items-center gap-6">
@@ -83,7 +94,8 @@ export function ContactSection() {
               whileHover={{ scale: 1.05 }}
               href={siteConfig.github}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
+              aria-label="Ammar Akbar GitHub"
               className="inline-flex items-center gap-1.5 hover:text-[var(--color-foreground)] transition-colors min-h-[44px] underline underline-offset-4 decoration-[var(--color-border)] hover:decoration-[var(--color-foreground)]"
             >
               <Github className="w-3.5 h-3.5" />

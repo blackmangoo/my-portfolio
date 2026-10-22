@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { siteConfig } from "@/data/site";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -17,36 +16,28 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://ammar.works"),
-  title: `${siteConfig.name} | AI/ML Engineer & Full-Stack AI Developer`,
-  description: siteConfig.hero.subheadline,
-  keywords: [
-    siteConfig.name,
-    "Ammar Akbar",
-    "AI Engineer",
-    "Machine Learning Engineer",
-    "Computer Vision",
-    "YOLOv11",
-    "Kalman Filter",
-    "FAST-NUCES",
-    "FastAPI",
-    "LLM Agents",
-    "RAG",
-    "Next.js",
-  ],
-  authors: [{ name: siteConfig.name, url: "https://ammar.works" }],
-  creator: siteConfig.name,
+  title: "Ammar Akbar | AI/ML Engineer | LLM Orchestration & RAG",
+  description:
+    "AI/ML Engineer and BS Artificial Intelligence graduate from FAST-NUCES specializing in LLM orchestration, RAG, and applied NLP. Building context-aware AI systems with deterministic safety controls.",
+  alternates: {
+    canonical: "https://ammar.works",
+  },
+  authors: [{ name: "Ammar Akbar", url: "https://ammar.works" }],
+  creator: "Ammar Akbar",
   openGraph: {
-    title: `${siteConfig.name} | AI/ML Engineer`,
-    description: siteConfig.hero.subheadline,
+    title: "Ammar Akbar | AI/ML Engineer",
+    description:
+      "AI/ML Engineer and BS Artificial Intelligence graduate from FAST-NUCES specializing in LLM orchestration, RAG, and applied NLP.",
     url: "https://ammar.works",
-    siteName: `${siteConfig.shortName} Portfolio`,
+    siteName: "Ammar Akbar Portfolio",
     type: "website",
     locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: `${siteConfig.name} | AI/ML Engineer`,
-    description: siteConfig.hero.subheadline,
+    title: "Ammar Akbar | AI/ML Engineer",
+    description:
+      "AI/ML Engineer and BS Artificial Intelligence graduate from FAST-NUCES specializing in LLM orchestration, RAG, and applied NLP.",
   },
   robots: {
     index: true,
@@ -57,25 +48,30 @@ export const metadata: Metadata = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
-  name: siteConfig.name,
-  alternateName: siteConfig.shortName,
-  jobTitle: siteConfig.role,
+  name: "Ammar Akbar",
+  jobTitle: "AI/ML Engineer",
   alumniOf: {
     "@type": "EducationalOrganization",
-    name: siteConfig.education.institution,
+    name: "FAST - National University of Computer and Emerging Sciences",
   },
   url: "https://ammar.works",
-  sameAs: [siteConfig.github, siteConfig.linkedin],
+  sameAs: [
+    "https://github.com/blackmangoo",
+    "https://linkedin.com/in/ammar-akbar2002",
+  ],
   knowsAbout: [
     "Artificial Intelligence",
+    "Large Language Models (LLMs)",
+    "Retrieval-Augmented Generation (RAG)",
+    "Natural Language Processing (NLP)",
+    "LoRA / QLoRA Fine-Tuning",
+    "pgvector (HNSW)",
+    "FastAPI",
     "Computer Vision",
-    "YOLOv11",
+    "YOLO11",
     "Sensor Fusion",
     "Kalman Filter",
-    "Machine Learning",
-    "FastAPI",
-    "LLM Agents",
-    "Three.js",
+    "Three.js / WebGL",
   ],
 };
 
@@ -95,6 +91,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[var(--color-background)] text-[var(--color-foreground)] transition-colors`}
       >
+        <a
+          href="#projects"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2.5 focus:bg-[var(--color-foreground)] focus:text-[var(--color-background)] focus:rounded-sm focus:shadow-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] font-medium text-xs"
+        >
+          Skip to content
+        </a>
         {children}
       </body>
     </html>
